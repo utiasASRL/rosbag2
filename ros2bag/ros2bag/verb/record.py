@@ -68,9 +68,9 @@ class RecordVerb(VerbExtension):
                   'the bag will split at whichever threshold is reached first.'
         )
         parser.add_argument(
-            '--max-cache-size', type=int, default=0,
-            help='maximum amount of messages to hold in cache before writing to disk. '
-                 'Default it is zero, writing every message directly to disk.'
+            '--max-cache-size', type=int, default=2**20,
+            help='Maximum number of bytes to cache before writing to disk. '
+                 'Defaults to 1 MiB. Setting to 0 disables the cache'
         )
         parser.add_argument(
             '--compression-mode', type=str, default='none',
