@@ -33,7 +33,7 @@ void DataStreamReader<MessageType>::openAndGetMessageType() {
 }
 
 template <typename MessageType>
-std::shared_ptr<std::any> DataStreamReader<MessageType>::readAtIndex(
+std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::readAtIndex(
     int32_t index) {
   openAndGetMessageType();
   auto bag_message = reader_->read_at_index(index);
@@ -44,12 +44,12 @@ std::shared_ptr<std::any> DataStreamReader<MessageType>::readAtIndex(
   this->serialization_.deserialize_message(&extracted_serialized_msg,
                                            extracted_msg.get());
 
-  auto anytype_msg = std::make_shared<std::any>(*extracted_msg);
+  auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
   return anytype_msg;
 }
 
 template <typename MessageType>
-std::shared_ptr<std::any> DataStreamReader<MessageType>::readAtTimestamp(
+std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::readAtTimestamp(
     rcutils_time_point_value_t time) {
   openAndGetMessageType();
   auto bag_message = reader_->read_at_timestamp(time);
@@ -59,12 +59,12 @@ std::shared_ptr<std::any> DataStreamReader<MessageType>::readAtTimestamp(
       *bag_message->serialized_data);
   this->serialization_.deserialize_message(&extracted_serialized_msg,
                                            extracted_msg.get());
-  auto anytype_msg = std::make_shared<std::any>(*extracted_msg);
+  auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
   return anytype_msg;
 }
 
 template <typename MessageType>
-std::shared_ptr<std::vector<std::shared_ptr<std::any>>>
+std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
 DataStreamReader<MessageType>::readAtIndexRange(int32_t index_begin,
                                                 int32_t index_end) {
   openAndGetMessageType();
@@ -74,14 +74,14 @@ DataStreamReader<MessageType>::readAtIndexRange(int32_t index_begin,
   // std::endl;
 
   auto deserialized_bag_message_vector =
-      std::make_shared<std::vector<std::shared_ptr<std::any>>>();
+      std::make_shared<std::vector<std::shared_ptr<VTRMessage>>>();
   for (auto bag_message : *bag_message_vector) {
     auto extracted_msg = std::make_shared<MessageType>();
     rclcpp::SerializedMessage extracted_serialized_msg(
         *bag_message->serialized_data);
     this->serialization_.deserialize_message(&extracted_serialized_msg,
                                              extracted_msg.get());
-    auto anytype_msg = std::make_shared<std::any>(*extracted_msg);
+    auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
     deserialized_bag_message_vector->push_back(
         anytype_msg);  // ToDo: reserve the vector instead of pushing
                        // back
@@ -90,7 +90,7 @@ DataStreamReader<MessageType>::readAtIndexRange(int32_t index_begin,
 }
 
 template <typename MessageType>
-std::shared_ptr<std::vector<std::shared_ptr<std::any>>>
+std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
 DataStreamReader<MessageType>::readAtTimestampRange(
     rcutils_time_point_value_t time_begin,
     rcutils_time_point_value_t time_end) {
@@ -101,14 +101,14 @@ DataStreamReader<MessageType>::readAtTimestampRange(
   // std::endl;
 
   auto deserialized_bag_message_vector =
-      std::make_shared<std::vector<std::shared_ptr<std::any>>>();
+      std::make_shared<std::vector<std::shared_ptr<VTRMessage>>>();
   for (auto bag_message : *bag_message_vector) {
     auto extracted_msg = std::make_shared<MessageType>();
     rclcpp::SerializedMessage extracted_serialized_msg(
         *bag_message->serialized_data);
     this->serialization_.deserialize_message(&extracted_serialized_msg,
                                              extracted_msg.get());
-    auto anytype_msg = std::make_shared<std::any>(*extracted_msg);
+    auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
     deserialized_bag_message_vector->push_back(
         anytype_msg);  // ToDo: reserve the vector instead of pushing
                        // back

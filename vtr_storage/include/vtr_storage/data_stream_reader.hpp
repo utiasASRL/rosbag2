@@ -1,8 +1,7 @@
 #pragma once
 
-#include <any>
 #include <utility>
-
+#include "vtr_storage/message.hpp"
 #include "vtr_storage/data_stream_base.hpp"
 #include "vtr_storage/random_access_reader.hpp"
 
@@ -19,12 +18,12 @@ class DataStreamReaderBase : public DataStreamBase {
   virtual void openAndGetMessageType() = 0;
   virtual void close() = 0;
 
-  virtual std::shared_ptr<std::any> readAtIndex(int32_t index) = 0;
-  virtual std::shared_ptr<std::any> readAtTimestamp(
+  virtual std::shared_ptr<VTRMessage> readAtIndex(int32_t index) = 0;
+  virtual std::shared_ptr<VTRMessage> readAtTimestamp(
       rcutils_time_point_value_t time) = 0;
-  virtual std::shared_ptr<std::vector<std::shared_ptr<std::any>>>
+  virtual std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
   readAtIndexRange(int32_t index_begin, int32_t index_end) = 0;
-  virtual std::shared_ptr<std::vector<std::shared_ptr<std::any>>>
+  virtual std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
   readAtTimestampRange(rcutils_time_point_value_t time_begin,
                        rcutils_time_point_value_t time_end) = 0;
 };
@@ -39,12 +38,12 @@ class DataStreamReader : public DataStreamReaderBase {
   void openAndGetMessageType() override;
   void close() override;
 
-  std::shared_ptr<std::any> readAtIndex(int32_t index) override;
-  std::shared_ptr<std::any> readAtTimestamp(
+  std::shared_ptr<VTRMessage> readAtIndex(int32_t index) override;
+  std::shared_ptr<VTRMessage> readAtTimestamp(
       rcutils_time_point_value_t time) override;
-  std::shared_ptr<std::vector<std::shared_ptr<std::any>>> readAtIndexRange(
+  std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>> readAtIndexRange(
       int32_t index_begin, int32_t index_end) override;
-  std::shared_ptr<std::vector<std::shared_ptr<std::any>>> readAtTimestampRange(
+  std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>> readAtTimestampRange(
       rcutils_time_point_value_t time_begin,
       rcutils_time_point_value_t time_end) override;
 

@@ -30,10 +30,7 @@ class VTRMessage {
     try {
       return std::any_cast<T>(message_);
     } catch (const std::bad_any_cast& e) {
-      std::stringstream ss;
-      ss << "Any cast failed in retrieving data in VTR Storage. Error: "
-         << e.what();
-      throw std::runtime_error(ss.str());
+      throw std::runtime_error("Any cast failed in retrieving data in VTR Storage");
     }
   }
 
