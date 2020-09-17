@@ -1,4 +1,3 @@
-#include <any>
 #include <chrono>
 #include <cstdio>
 #include <iostream>
@@ -9,7 +8,7 @@
 
 #include "rcpputils/filesystem_helper.hpp"
 #include "rcutils/time.h"
-
+#include "vtr_storage/message.hpp"
 #include "vtr_storage/data_stream_reader.hpp"
 #include "vtr_storage/data_stream_writer.hpp"
 
@@ -27,7 +26,7 @@ int main() {
   writer.open();
   for (int i = 1; i <= 10; i++) {
     test_msg.float64_value = i * 10;
-    int32_t index_return = writer.write(std::any(test_msg));
+    int32_t index_return = writer.write(vtr::storage::VTRMessage(test_msg));
     std::cout << index_return << std::endl;
   }
   writer.close();
@@ -39,7 +38,7 @@ int main() {
   writer2.open();
   for (int i = 11; i <= 20; i++) {
     test_msg.float64_value = i * 10;
-    int32_t index_return = writer2.write(std::any(test_msg));
+    int32_t index_return = writer2.write(vtr::storage::VTRMessage(test_msg));
     std::cout << index_return << std::endl;
   }
   // writer2.close();
@@ -48,14 +47,13 @@ int main() {
   vtr::storage::DataStreamReader<TestMsgT> reader(
       "/home/daniel/test/ROS2BagFileParsing/dev_ws/test_rosbag2_writer_api_bag",
       "test_stream");
-  test_msg.float64_value =
-      std::any_cast<TestMsgT>(*(reader.readAtIndex(5))).float64_value;
+  test_msg.float64_value = reader.readAtIndex(5)->template get<TestMsgT>().float64_value;
   std::cout << test_msg.float64_value << std::endl;
 
   std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
   auto bag_message_vector = reader.readAtIndexRange(1, 9);
   for (auto message : *bag_message_vector) {
-    std::cout << std::any_cast<TestMsgT>(*message).float64_value << std::endl;
+    std::cout << message->template get<TestMsgT>().float64_value << std::endl;
   }
 
   writer2.close();
@@ -63,11 +61,14 @@ int main() {
   writer2.open();
   for (int i = 21; i <= 30; i++) {
     test_msg.float64_value = i * 10;
-    int32_t index_return = writer2.write(std::any(test_msg));
+    int32_t index_return = writer2.write(vtr::storage::VTRMessage(test_msg));
+    auto anytype_msg = reader.readAtIndex(i);
     test_msg.float64_value =
-        std::any_cast<TestMsgT>(*(reader.readAtIndex(i))).float64_value;
+        anytype_msg->template get<TestMsgT>().float64_value;
+    auto index = anytype_msg->get_index();
     std::cout << "Written index: " << index_return
-              << ", Read: " << test_msg.float64_value << std::endl;
+              << ", Read: " << test_msg.float64_value
+              << ", Read index: " << index << std::endl;
   }
   // writer auto closes when it goes out of scope
   // writer2.close(); // when writer closes, it writes the metadata.yaml

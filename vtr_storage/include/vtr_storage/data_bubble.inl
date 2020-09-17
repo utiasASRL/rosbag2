@@ -33,10 +33,8 @@ bool DataBubble<MessageType>::isLoaded(int32_t idx) {
 
 template <typename MessageType>
 bool DataBubble<MessageType>::isLoaded(TimeStamp time) {
-  // auto time_it = time_map_.find(time.nanoseconds_since_epoch()); // get the
-  // index from the time map return time_it != time_map_.end() &&
-  // isLoaded(time_it->second);
-  return false;
+  auto time_it = time_map_.find(time); // get the index from the time map
+  return time_it != time_map_.end() && isLoaded(time_it->second);
 }
 
 template <typename MessageType>
@@ -64,15 +62,15 @@ void DataBubble<MessageType>::load(int32_t local_idx) {
       data_stream_->readAtIndex(indices_.start_index + local_idx);
   if (anytype_message) {
     this->data_map_.insert({local_idx, *anytype_message});
+    // ToDo: why is this in the original code?
     // if(data_stream_->next(data_map_[idx]) == false) {
     //     data_map_.erase(idx);
     //     return;
     // }
-
-    // auto stamp =
-    // data_map_[local_idx].baseMessage().header().sensor_time_stamp();
-    // time_map_.insert({stamp.nanoseconds_since_epoch(),idx});
-    // memoryUsageBytes_+= data_map_[local_idx].ByteSize();
+    if (anytype_message->has_timestamp()) {
+      this->time_map_.insert({anytype_message->get_timestamp(), local_idx});
+    }
+    // memoryUsageBytes_+= this->data_map_[local_idx].ByteSize(); // ToDo get bytesize from ros messages somehow?
   }
 }
 
@@ -83,25 +81,30 @@ void DataBubble<MessageType>::load(int32_t global_idx0, int32_t global_idx1) {
   if (anytype_message_vector->size() > 0) {
     for (int32_t local_idx = 0; local_idx <= global_idx1 - global_idx0;
          ++local_idx) {
-      DataMap::value_type map_insert(local_idx,
-                                     *(anytype_message_vector->at(local_idx)));
-      this->data_map_.insert(map_insert);
+      auto anytype_message = anytype_message_vector->at(local_idx);
+      this->data_map_.insert({local_idx, *anytype_message});
       // if(data_stream_->next(data_map_[idx]) == false) {
       //     data_map_.erase(idx);
       //     return;
       // }
-      // if(local_idx == 0){ indices_.start_time =
-      // data_map_[idx].header().sensor_time_stamp();} if(local_idx ==
-      // global_idx1-global_idx0){ indices_.stop_time =
-      // data_map_[local_idx].header().sensor_time_stamp();}
-      // time_map_.insert({data_map_[local_idx].header().sensor_time_stamp().nanoseconds_since_epoch(),local_idx});
+      if (anytype_message->has_timestamp()) {
+          this->time_map_.insert({anytype_message->get_timestamp(), local_idx});
+       }
       // memoryUsageBytes_+= data_map_[local_idx].ByteSize();
     }
   }
 }
 
 template <typename MessageType>
-void DataBubble<MessageType>::load(TimeStamp time) {
+void DataBubble<MessageType>::loadTime(TimeStamp time) {
+  auto anytype_message =
+      data_stream_->readAtTimestamp(time);
+  if (anytype_message) {
+    auto local_idx = anytype_message->get_index() - indices_.start_index;
+    this->data_map_.insert({local_idx, *anytype_message});
+    this->time_map_.insert({time, local_idx});
+  }
+
   /// Seek in the stream to this time.
   // if(data_stream_->readAtTimestamp(time)) {
   //   Message message;
@@ -151,7 +154,22 @@ void DataBubble<MessageType>::load(TimeStamp time) {
 }
 
 template <typename MessageType>
-void DataBubble<MessageType>::load(TimeStamp time0, TimeStamp time1) {
+void DataBubble<MessageType>::loadTime(TimeStamp time0, TimeStamp time1) {
+  auto anytype_message_vector =
+      data_stream_->readAtTimestampRange(time0, time1);
+  if (anytype_message_vector->size() > 0) {
+    for (auto anytype_message : *anytype_message_vector) {
+      auto local_idx = anytype_message->get_index() - indices_.start_index;
+      auto time = anytype_message->get_timestamp();
+      this->data_map_.insert({local_idx, *anytype_message});
+      this->time_map_.insert({time, local_idx});
+      // if(data_stream_->next(data_map_[idx]) == false) {
+      //     data_map_.erase(idx);
+      //     return;
+      // }
+      // memoryUsageBytes_+= data_map_[local_idx].ByteSize();
+    }
+  }
   // bool continue_load = true;
   // if(data_stream_->seek(time0)) {
   //     while(continue_load) {
@@ -213,15 +231,19 @@ VTRMessage DataBubble<MessageType>::retrieve(int32_t local_idx) {
   // if(isLoaded(local_idx) == false) {
   //     load(local_idx);
   // }
-  if (isLoaded(local_idx) == false) {
-    throw std::out_of_range("DataBubble has not data at this index.");
+  if (!isLoaded(local_idx)) {
+    throw std::out_of_range("DataBubble has no data at this index.");
   }
 
   return this->data_map_[local_idx];
 }
 
 template <typename MessageType>
-VTRMessage DataBubble<MessageType>::retrieve(TimeStamp time) {
+VTRMessage DataBubble<MessageType>::retrieveTime(TimeStamp time) {
+  if (!isLoaded(time)) {
+    throw std::out_of_range("DataBubble has no data at this time.");
+  }
+  return this->data_map_[this->time_map_[time]];
   // // check to see if its in the time map
   // auto stamp_nanoseconds = time.nanoseconds_since_epoch();
   // if(time_map_.find(stamp_nanoseconds) != std::end(time_map_)) {

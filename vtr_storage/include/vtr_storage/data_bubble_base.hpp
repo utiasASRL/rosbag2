@@ -37,6 +37,7 @@ struct ChunkIndices {
 class DataBubbleBase {
  public:
   using DataMap = std::map<int32_t, VTRMessage>;
+  using TimeMap = std::map<TimeStamp, int32_t>;
 
   DataBubbleBase();
 
@@ -79,12 +80,12 @@ class DataBubbleBase {
 
   /// \brief loads a specific message based on a time tag into memory.
   /// \param time The time stamp of the message to be loaded.
-  virtual void load(TimeStamp time) = 0;
+  virtual void loadTime(TimeStamp time) = 0;
 
   /// \brief loads a range of messages based on time tags into memory.
   /// \param time Begining time stamp of the message to be loaded.
   /// \param time End time stamp of the message to be loaded.
-  virtual void load(TimeStamp time0, TimeStamp time1) = 0;
+  virtual void loadTime(TimeStamp time0, TimeStamp time1) = 0;
 
   /// \brief unloads all data associated with the vertex.
   virtual void unload() = 0;
@@ -127,7 +128,7 @@ class DataBubbleBase {
 
   /// \brief Retrieves a reference to the message.
   /// \param The timestamp of the message.
-  virtual VTRMessage retrieve(TimeStamp time) = 0;
+  virtual VTRMessage retrieveTime(TimeStamp time) = 0;
 
  protected:
   /// \brief the current end index of the bubble.
@@ -145,7 +146,7 @@ class DataBubbleBase {
   /// \brief The map of currently loaded data.
   DataMap data_map_;
   /// \brief maps timestamps to indices in the data map.
-  std::map<uint64_t, int32_t> time_map_;
+  TimeMap time_map_;
 };
 }  // namespace storage
 }  // namespace vtr

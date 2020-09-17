@@ -1,4 +1,3 @@
-#include <any>
 #include <cstdio>
 #include <iostream>
 #include <memory>
@@ -8,6 +7,7 @@
 #include "rcpputils/filesystem_helper.hpp"
 #include "rcutils/time.h"
 
+#include "vtr_storage/message.hpp"
 #include "vtr_storage/data_bubble.hpp"
 #include "vtr_storage/data_stream_reader.hpp"
 #include "vtr_storage/data_stream_writer.hpp"
@@ -26,7 +26,7 @@ int main() {
   writer.open();
   for (int i = 1; i <= 10; i++) {
     test_msg.float64_value = i * 10;
-    writer.write(std::any(test_msg));
+    writer.write(vtr::storage::VTRMessage(test_msg));
   }
   writer.close();
 
@@ -40,7 +40,7 @@ int main() {
   bubble.load();
   auto message = bubble.retrieve(3);  // 3 is local index of this bubble, which
                                       // translates to a global index of 2+3=5
-  std::cout << std::any_cast<TestMsgT>(message).float64_value << std::endl;
+  std::cout << message.template get<TestMsgT>().float64_value << std::endl;
 
   // test_msg.float64_value = reader.readAtIndex(5)->float64_value;
   // std::cout << test_msg.float64_value << std::endl;

@@ -40,12 +40,12 @@ class DataBubble : public DataBubbleBase {
 
   /// \brief loads a specific message based on a time tag into memory.
   /// \param time The time stamp of the message to be loaded.
-  void load(TimeStamp time);
+  void loadTime(TimeStamp time);
 
   /// \brief loads a range of messages based on time tags into memory.
   /// \param time Begining time stamp of the message to be loaded.
   /// \param time End time stamp of the message to be loaded.
-  void load(TimeStamp time0, TimeStamp time1);
+  void loadTime(TimeStamp time0, TimeStamp time1);
 
   /// \brief unloads all data associated with the vertex.
   void unload();
@@ -80,7 +80,7 @@ class DataBubble : public DataBubbleBase {
 
   /// \brief Retrieves a reference to the message.
   /// \param The timestamp of the message.
-  VTRMessage retrieve(TimeStamp time);
+  VTRMessage retrieveTime(TimeStamp time);
 
  private:
   /// \brief A pointer to the Robochunk stream.

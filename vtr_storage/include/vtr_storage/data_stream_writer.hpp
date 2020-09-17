@@ -13,7 +13,7 @@ namespace storage {
 class DataStreamWriterBase : public DataStreamBase {
  public:
   DataStreamWriterBase(const std::string &data_directory_string,
-                       const std::string &stream_name, bool append = false)
+                       const std::string &stream_name = "", bool append = false)
       : DataStreamBase(data_directory_string, stream_name), append_(append) {}
   ~DataStreamWriterBase(){};
 
@@ -31,7 +31,7 @@ template <typename MessageType>
 class DataStreamWriter : public DataStreamWriterBase {
  public:
   DataStreamWriter(const std::string &data_directory_string,
-                   const std::string &stream_name, bool append = false);
+                   const std::string &stream_name = "", bool append = false);
   ~DataStreamWriter();
 
   void open() override;

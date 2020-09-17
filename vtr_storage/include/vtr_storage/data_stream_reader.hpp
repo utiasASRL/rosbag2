@@ -11,7 +11,7 @@ namespace storage {
 class DataStreamReaderBase : public DataStreamBase {
  public:
   DataStreamReaderBase(const std::string &data_directory,
-                       const std::string &stream_name)
+                       const std::string &stream_name = "")
       : DataStreamBase(data_directory, stream_name) {}
   ~DataStreamReaderBase() {}
 
@@ -32,7 +32,7 @@ template <typename MessageType>
 class DataStreamReader : public DataStreamReaderBase {
  public:
   DataStreamReader(const std::string &data_directory,
-                   const std::string &stream_name);
+                   const std::string &stream_name = "");
   ~DataStreamReader();
 
   void openAndGetMessageType() override;
@@ -51,6 +51,8 @@ class DataStreamReader : public DataStreamReaderBase {
   // necessary
 
  protected:
+  std::shared_ptr<VTRMessage> convertBagMessage(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message);
+
   rclcpp::Serialization<MessageType> serialization_;
   std::shared_ptr<RandomAccessReader> reader_;
 };
