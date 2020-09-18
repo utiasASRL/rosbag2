@@ -1,8 +1,8 @@
 #pragma once
 
 #include <utility>
-#include "vtr_storage/message.hpp"
 #include "vtr_storage/data_stream_base.hpp"
+#include "vtr_storage/message.hpp"
 #include "vtr_storage/random_access_reader.hpp"
 
 namespace vtr {
@@ -43,15 +43,16 @@ class DataStreamReader : public DataStreamReaderBase {
       rcutils_time_point_value_t time) override;
   std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>> readAtIndexRange(
       int32_t index_begin, int32_t index_end) override;
-  std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>> readAtTimestampRange(
-      rcutils_time_point_value_t time_begin,
-      rcutils_time_point_value_t time_end) override;
+  std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
+  readAtTimestampRange(rcutils_time_point_value_t time_begin,
+                       rcutils_time_point_value_t time_end) override;
 
   // next() isn't needed for now due to ranged random access. Can add in if
   // necessary
 
  protected:
-  std::shared_ptr<VTRMessage> convertBagMessage(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message);
+  std::shared_ptr<VTRMessage> convertBagMessage(
+      std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message);
 
   rclcpp::Serialization<MessageType> serialization_;
   std::shared_ptr<RandomAccessReader> reader_;

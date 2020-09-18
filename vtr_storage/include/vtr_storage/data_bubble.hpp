@@ -33,6 +33,7 @@ struct ChunkIndices {
 class DataBubble {
   using DataMap = std::map<int32_t, VTRMessage>;
   using TimeMap = std::map<TimeStamp, int32_t>;
+
  public:
   DataBubble();
 
@@ -127,7 +128,7 @@ class DataBubble {
  private:
   /// \brief A pointer to the Robochunk stream.
   std::shared_ptr<DataStreamReaderBase> data_stream_;
-    /// \brief the current end index of the bubble.
+  /// \brief the current end index of the bubble.
   int32_t endIdx_;
   /// \brief The indices associated with this bubble.
   ChunkIndices indices_;

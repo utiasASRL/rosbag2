@@ -15,21 +15,16 @@ DataBubble::~DataBubble() {
   data_stream_->close();
 }
 
-void DataBubble::initialize(
-    std::shared_ptr<DataStreamReaderBase> data_stream) {
+void DataBubble::initialize(std::shared_ptr<DataStreamReaderBase> data_stream) {
   data_stream_ = data_stream;
 }
 
-int32_t DataBubble::size() {
-  return data_map_.size();
-}
+int32_t DataBubble::size() { return data_map_.size(); }
 
-bool DataBubble::isLoaded(int32_t idx) {
-  return data_map_.count(idx);
-}
+bool DataBubble::isLoaded(int32_t idx) { return data_map_.count(idx); }
 
 bool DataBubble::isLoaded(TimeStamp time) {
-  auto time_it = time_map_.find(time); // get the index from the time map
+  auto time_it = time_map_.find(time);  // get the index from the time map
   return time_it != time_map_.end() && isLoaded(time_it->second);
 }
 
@@ -64,7 +59,8 @@ void DataBubble::load(int32_t local_idx) {
     if (anytype_message->has_timestamp()) {
       time_map_.insert({anytype_message->get_timestamp(), local_idx});
     }
-    // memoryUsageBytes_+= data_map_[local_idx].ByteSize(); // ToDo get bytesize from ros messages somehow?
+    // memoryUsageBytes_+= data_map_[local_idx].ByteSize(); // ToDo get bytesize
+    // from ros messages somehow?
   }
 }
 
@@ -81,16 +77,15 @@ void DataBubble::load(int32_t global_idx0, int32_t global_idx1) {
       //     return;
       // }
       if (anytype_message->has_timestamp()) {
-          time_map_.insert({anytype_message->get_timestamp(), local_idx});
-       }
+        time_map_.insert({anytype_message->get_timestamp(), local_idx});
+      }
       // memoryUsageBytes_+= data_map_[local_idx].ByteSize();
     }
   }
 }
 
 void DataBubble::loadTime(TimeStamp time) {
-  auto anytype_message =
-      data_stream_->readAtTimestamp(time);
+  auto anytype_message = data_stream_->readAtTimestamp(time);
   if (anytype_message) {
     auto local_idx = anytype_message->get_index() - indices_.start_index;
     data_map_.insert({local_idx, *anytype_message});
