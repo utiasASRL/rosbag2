@@ -21,6 +21,7 @@ namespace storage {
 class SequentialAppendWriter : public rosbag2_cpp::writers::SequentialWriter {
  public:
   explicit SequentialAppendWriter(
+      bool append_mode,
       std::unique_ptr<rosbag2_storage::StorageFactoryInterface>
           storage_factory = std::make_unique<rosbag2_storage::StorageFactory>(),
       std::shared_ptr<rosbag2_cpp::SerializationFormatConverterFactoryInterface>

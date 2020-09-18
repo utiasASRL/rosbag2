@@ -17,6 +17,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "rcpputils/filesystem_helper.hpp"
 
@@ -232,7 +233,9 @@ BagMetadata MetadataIo::read_metadata(const std::string & uri)
     YAML::Node yaml_file = YAML::LoadFile(get_metadata_file_name(uri));
     auto metadata = yaml_file["rosbag2_bagfile_information"].as<rosbag2_storage::BagMetadata>();
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    std::cout << "here" << std::endl;
     metadata.bag_size = rcutils_calculate_directory_size(uri.c_str(), allocator);
+    std::cout << "here" << std::endl;
     return metadata;
   } catch (const YAML::Exception & ex) {
     throw std::runtime_error(std::string("Exception on parsing info file: ") + ex.what());

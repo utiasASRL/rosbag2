@@ -21,12 +21,7 @@ DataStreamWriter<MessageType>::~DataStreamWriter() {
 template <typename MessageType>
 void DataStreamWriter<MessageType>::open() {
   if (!this->opened_) {
-    if (!this->append_) {
-      // ToDo: remove_all cannot remove all the contents if there is a
-      // subdirectory within data_directory_. Reasons unknown...
-      rcpputils::fs::remove_all(this->data_directory_);
-    }
-    writer_ = std::make_shared<SequentialAppendWriter>();
+    writer_ = std::make_shared<SequentialAppendWriter>(append_);
     writer_->open(this->storage_options_, this->converter_options_);
     if (!this->append_) writer_->create_topic(tm_);
     this->opened_ = true;

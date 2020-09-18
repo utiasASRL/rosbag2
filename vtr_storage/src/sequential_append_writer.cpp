@@ -29,12 +29,14 @@ std::string format_storage_uri(const std::string& base_folder,
 }
 
 SequentialAppendWriter::SequentialAppendWriter(
+    bool append_mode,
     std::unique_ptr<rosbag2_storage::StorageFactoryInterface> storage_factory,
     std::shared_ptr<rosbag2_cpp::SerializationFormatConverterFactoryInterface>
         converter_factory,
     std::unique_ptr<rosbag2_storage::MetadataIo> metadata_io)
     : SequentialWriter(std::move(storage_factory), std::move(converter_factory),
-                       std::move(metadata_io)) {}
+                       std::move(metadata_io)),
+                       append_mode_(append_mode) {}
 
 SequentialAppendWriter::~SequentialAppendWriter() {}
 
@@ -55,11 +57,11 @@ void SequentialAppendWriter::open(
                                                           converter_factory_);
   }
   rcpputils::fs::path db_path(base_folder_);
-  if (db_path.is_directory()) {
+  // if (db_path.is_directory()) {
     // std::cout << "Database directory already exists (" << db_path.string()
     //           << "), assuming append mode." << std::endl;
-    append_mode_ = true;
-  }
+  //   append_mode_ = true;
+  // }
   bool dir_created = rcpputils::fs::create_directories(
       db_path);  // will fail if file already exists, i.e. in append mode
   // if (!dir_created) {
@@ -69,6 +71,12 @@ void SequentialAppendWriter::open(
   // }
 
   const auto storage_uri = format_storage_uri(base_folder_, 0);
+  if (!append_mode_) {
+    rcpputils::fs::remove(rcpputils::fs::path(storage_uri+".db3"));
+    rcpputils::fs::remove(rcpputils::fs::path(storage_uri+".db3-shm"));
+    rcpputils::fs::remove(rcpputils::fs::path(storage_uri+".db3-wal"));
+    rcpputils::fs::remove(db_path / "metadata.yaml");
+  }
 
   storage_ = storage_factory_->open_read_write(storage_uri,
                                                storage_options.storage_id);
