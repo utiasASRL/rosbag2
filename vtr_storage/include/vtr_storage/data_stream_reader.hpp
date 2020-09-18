@@ -13,7 +13,7 @@ class DataStreamReaderBase : public DataStreamBase {
   DataStreamReaderBase(const std::string &data_directory,
                        const std::string &stream_name = "")
       : DataStreamBase(data_directory, stream_name) {}
-  ~DataStreamReaderBase() {}
+  virtual ~DataStreamReaderBase() {}
 
   virtual void openAndGetMessageType() = 0;
   virtual void close() = 0;

@@ -43,6 +43,8 @@ class DataBubble {
   /// \param A pointer to the associated data stream.
   void initialize(std::shared_ptr<DataStreamReaderBase> data_stream);
 
+  void reset();
+
   /// \brief loads all of the messages associated with this bubble into memory.
   void load();
 

@@ -15,7 +15,7 @@ class DataStreamWriterBase : public DataStreamBase {
   DataStreamWriterBase(const std::string &data_directory_string,
                        const std::string &stream_name = "", bool append = false)
       : DataStreamBase(data_directory_string, stream_name), append_(append) {}
-  ~DataStreamWriterBase(){};
+  virtual ~DataStreamWriterBase(){};
 
   virtual void open() = 0;
   virtual void close() = 0;

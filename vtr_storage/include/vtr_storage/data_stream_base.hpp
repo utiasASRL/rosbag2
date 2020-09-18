@@ -19,7 +19,7 @@ class DataStreamBase {
  public:
   DataStreamBase(const std::string &data_directory_string,
                  const std::string &stream_name = "");
-  ~DataStreamBase();
+  virtual ~DataStreamBase();
 
  protected:
   rosbag2_cpp::StorageOptions storage_options_;

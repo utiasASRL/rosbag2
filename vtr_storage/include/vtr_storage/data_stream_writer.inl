@@ -21,6 +21,11 @@ DataStreamWriter<MessageType>::~DataStreamWriter() {
 template <typename MessageType>
 void DataStreamWriter<MessageType>::open() {
   if (!this->opened_) {
+    if (!this->append_) {
+      // ToDo: remove_all cannot remove all the contents if there is a
+      // subdirectory within data_directory_. Reasons unknown...
+      rcpputils::fs::remove_all(this->data_directory_);
+    }
     writer_ = std::make_shared<SequentialAppendWriter>();
     writer_->open(this->storage_options_, this->converter_options_);
     if (!this->append_) writer_->create_topic(tm_);
@@ -53,8 +58,7 @@ int32_t DataStreamWriter<MessageType>::write(const VTRMessage &vtr_message) {
   }
   if (!this->opened_) open();
   auto message = vtr_message.template get<MessageType>();
-  auto bag_message =
-      std::make_shared<rosbag2_storage::SerializedBagMessage>();
+  auto bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
   if (vtr_message.has_timestamp()) {
     bag_message->time_stamp = vtr_message.get_timestamp();
   } else {

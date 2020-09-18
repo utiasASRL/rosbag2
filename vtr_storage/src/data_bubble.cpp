@@ -10,9 +10,18 @@ DataBubble::DataBubble()
       memoryUsageBytes_(0),
       is_loaded_(false) {}
 
-DataBubble::~DataBubble() {
+DataBubble::~DataBubble() { reset(); }
+
+void DataBubble::reset() {
+  endIdx_ = 0;
+  loadFromIndex_ = false;
+  loadFromTime_ = false;
+  memoryUsageBytes_ = 0;
+  is_loaded_ = false;
+  indices_ = ChunkIndices();
   data_map_.clear();
-  data_stream_->close();
+  time_map_.clear();
+  data_stream_.reset();
 }
 
 void DataBubble::initialize(std::shared_ptr<DataStreamReaderBase> data_stream) {

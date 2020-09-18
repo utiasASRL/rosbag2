@@ -6,9 +6,12 @@ namespace storage {
 
 DataStreamBase::DataStreamBase(const std::string &data_directory_string,
                                const std::string &stream_name)
-    : data_directory_(rcpputils::fs::path(data_directory_string) / stream_name),
+    : data_directory_(rcpputils::fs::path(data_directory_string)),
       stream_name_(stream_name),
       opened_(false) {
+  if (stream_name != "") {
+    data_directory_ /= stream_name;
+  }
   storage_options_.uri = data_directory_.string();
   storage_options_.storage_id = "sqlite3";
   storage_options_.max_bagfile_size = 0;

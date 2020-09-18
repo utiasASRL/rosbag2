@@ -33,7 +33,8 @@ void DataStreamReader<MessageType>::openAndGetMessageType() {
 }
 
 template <typename MessageType>
-std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::convertBagMessage(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message) {
+std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::convertBagMessage(
+    std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message) {
   auto extracted_msg = std::make_shared<MessageType>();
   rclcpp::SerializedMessage serialized_msg;
   rclcpp::SerializedMessage extracted_serialized_msg(

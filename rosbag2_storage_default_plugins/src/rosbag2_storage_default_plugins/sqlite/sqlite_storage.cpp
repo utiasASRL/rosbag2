@@ -85,7 +85,7 @@ void SqliteStorage::open(
     // READ_WRITE requires the DB to not exist.
     if (rcpputils::fs::path(relative_path_).exists()) {
       io_flag = rosbag2_storage::storage_interfaces::IOFlag::APPEND;
-      std::cout << "Warning: " << relative_path_ << "' already exists! Switching to append mode." << std::endl;
+      // std::cout << "Warning: " << relative_path_ << "' already exists! Switching to append mode." << std::endl;
     }
   } else if (is_read_only(io_flag)) {  // READ_ONLY
     relative_path_ = uri;
