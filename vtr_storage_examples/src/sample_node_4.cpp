@@ -45,7 +45,7 @@ int main() {
     std::cout << message->template get<TestMsgT>().float64_value << std::endl;
   }
 
-  vtr::storage::DataBubble<TestMsgT> bubble;
+  vtr::storage::DataBubble bubble;
   bubble.initialize(
       std::static_pointer_cast<vtr::storage::DataStreamReaderBase>(reader));
   bubble.loadTime(8000);

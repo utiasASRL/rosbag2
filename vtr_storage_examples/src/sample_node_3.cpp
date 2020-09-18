@@ -33,7 +33,7 @@ int main() {
   auto reader = std::make_shared<vtr::storage::DataStreamReader<TestMsgT>>(
       "/home/daniel/test/ROS2BagFileParsing/dev_ws/test_rosbag2_writer_api_bag",
       "test_stream");
-  vtr::storage::DataBubble<TestMsgT> bubble;
+  vtr::storage::DataBubble bubble;
   bubble.initialize(
       std::static_pointer_cast<vtr::storage::DataStreamReaderBase>(reader));
   bubble.setIndices(2, 8);
