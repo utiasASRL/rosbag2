@@ -18,7 +18,7 @@ namespace storage {
 class DataStreamBase {
  public:
   DataStreamBase(const std::string &data_directory_string,
-                 const std::string &stream_name);
+                 const std::string &stream_name = "");
   ~DataStreamBase();
 
  protected:
