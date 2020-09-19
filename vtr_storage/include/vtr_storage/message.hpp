@@ -8,7 +8,9 @@
 namespace vtr {
 namespace storage {
 
-constexpr rcutils_time_point_value_t NO_TIMESTAMP_VALUE =
+using TimeStamp = rcutils_time_point_value_t;
+
+constexpr TimeStamp NO_TIMESTAMP_VALUE =
     -1;  // timestamp value stored in sqlite database if message has no
          // timestamps
 
@@ -44,7 +46,7 @@ class VTRMessage {
     }
   }
 
-  rcutils_time_point_value_t get_timestamp() const {
+  TimeStamp get_timestamp() const {
     if (timestamp_ == boost::none) {
       throw std::runtime_error(
           "Attempted to get uninitialized timestamp of a VTRMessage");
@@ -55,9 +57,7 @@ class VTRMessage {
 
   bool has_timestamp() const { return timestamp_ != boost::none; }
 
-  void set_timestamp(rcutils_time_point_value_t new_timestamp) {
-    timestamp_ = new_timestamp;
-  }
+  void set_timestamp(TimeStamp new_timestamp) { timestamp_ = new_timestamp; }
 
   int32_t get_index() const {
     if (database_index_ == boost::none) {

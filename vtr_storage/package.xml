@@ -20,6 +20,8 @@
   <depend>rosidl_typesupport_introspection_cpp</depend>
   <depend>shared_queues_vendor</depend>
 
+  <depend>vtr_messages</depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

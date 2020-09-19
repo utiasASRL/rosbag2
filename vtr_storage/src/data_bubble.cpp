@@ -218,20 +218,18 @@ void DataBubble::insert(const VTRMessage& message) {
 }
 
 VTRMessage DataBubble::retrieve(int32_t local_idx) {
-  // if(isLoaded(local_idx) == false) {
-  //     load(local_idx);
-  // }
-  if (!isLoaded(local_idx)) {
+  if (!isLoaded(local_idx)) load(local_idx);
+  if (!isLoaded(local_idx))
     throw std::out_of_range("DataBubble has no data at this index.");
-  }
 
   return data_map_[local_idx];
 }
 
 VTRMessage DataBubble::retrieveTime(TimeStamp time) {
-  if (!isLoaded(time)) {
+  if (!isLoaded(time)) loadTime(time);
+  if (!isLoaded(time))
     throw std::out_of_range("DataBubble has no data at this time.");
-  }
+
   return data_map_[time_map_[time]];
   // // check to see if its in the time map
   // auto stamp_nanoseconds = time.nanoseconds_since_epoch();
