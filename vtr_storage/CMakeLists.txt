@@ -17,6 +17,7 @@ find_package(rosidl_runtime_cpp REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_typesupport_introspection_cpp REQUIRED)
 
+find_package(vtr_logging REQUIRED)
 find_package(vtr_messages REQUIRED)
 
 # Libraries
@@ -38,6 +39,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rosidl_runtime_cpp
   rosidl_typesupport_cpp
   rosidl_typesupport_introspection_cpp
+  vtr_logging
   vtr_messages
 )
 target_include_directories(${PROJECT_NAME}
@@ -58,6 +60,7 @@ ament_export_dependencies(
   rosidl_runtime_cpp
   rosidl_typesupport_cpp
   rosidl_typesupport_introspection_cpp
+  vtr_logging
   vtr_messages
 )
 

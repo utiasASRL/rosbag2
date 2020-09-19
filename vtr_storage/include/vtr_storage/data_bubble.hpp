@@ -2,6 +2,7 @@
 
 #include <map>
 #include "rcutils/types.h"
+#include "vtr_logging/logging.hpp"
 #include "vtr_messages/msg/time_stamp.hpp"
 #include "vtr_storage/data_stream_reader.hpp"
 
