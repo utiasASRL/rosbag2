@@ -435,9 +435,6 @@ uint64_t SqliteStorage::get_minimum_split_file_size() const
 
 rosbag2_storage::BagMetadata SqliteStorage::get_metadata()
 {
-  auto test_statement = database_->prepare_statement("SELECT count(*) FROM sqlite_master WHERE type = 'table'");
-  auto test_query = test_statement->execute_query<int>();
-  std::cout << std::get<0>(*(test_query.begin())) << std::endl;
   rosbag2_storage::BagMetadata metadata;
   metadata.storage_identifier = get_storage_identifier();
   metadata.relative_file_paths = {get_relative_file_path()};
