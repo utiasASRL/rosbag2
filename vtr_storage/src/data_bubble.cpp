@@ -42,16 +42,17 @@ void DataBubble::load() {
     return;
   }
   // seek to the start idx
-  if (loadFromIndex_ == true) {
+  if (loadFromIndex_) {
     load(indices_.start_index, indices_.stop_index);
     is_loaded_ = true;
-  } else if (loadFromTime_ == true) {
-    load(indices_.start_time, indices_.stop_time);
+  } 
+  if (loadFromTime_) {
+    loadTime(indices_.start_time, indices_.stop_time);
     is_loaded_ = true;
-  } else {
+  }
+  if (!loadFromIndex_ && !loadFromTime_) {
     is_loaded_ = false;
-    // LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or
-    // setTimeIndices";
+    LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";
   }
 }
 
