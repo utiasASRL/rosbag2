@@ -7,6 +7,7 @@
 #include "rcpputils/filesystem_helper.hpp"
 #include "rcutils/time.h"
 
+#include "vtr_logging/logging_init.hpp"
 #include "vtr_storage/message.hpp"
 #include "vtr_storage/data_bubble.hpp"
 #include "vtr_storage/data_stream_reader.hpp"

@@ -8,9 +8,11 @@
 
 #include "rcpputils/filesystem_helper.hpp"
 #include "rcutils/time.h"
-#include "vtr_storage/message.hpp"
+
+#include "vtr_logging/logging_init.hpp"
 #include "vtr_storage/data_stream_reader.hpp"
 #include "vtr_storage/data_stream_writer.hpp"
+#include "vtr_storage/message.hpp"
 
 #include "test_msgs/msg/basic_types.hpp"
 
@@ -47,7 +49,8 @@ int main() {
   vtr::storage::DataStreamReader<TestMsgT> reader(
       "/home/daniel/test/ROS2BagFileParsing/dev_ws/test_rosbag2_writer_api_bag",
       "test_stream");
-  test_msg.float64_value = reader.readAtIndex(5)->template get<TestMsgT>().float64_value;
+  test_msg.float64_value =
+      reader.readAtIndex(5)->template get<TestMsgT>().float64_value;
   std::cout << test_msg.float64_value << std::endl;
 
   std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;

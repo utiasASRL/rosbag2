@@ -24,7 +24,6 @@ find_package(vtr_storage REQUIRED)
 find_package(test_msgs REQUIRED)
 # find_package(std_msgs REQUIRED)
 
-  
 add_executable(sample_node_2 src/sample_node_2.cpp)
 target_include_directories(sample_node_2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -39,11 +38,11 @@ add_executable(sample_node_4 src/sample_node_4.cpp)
 target_include_directories(sample_node_3 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-  
+
 ament_target_dependencies(sample_node_2
       vtr_storage
       test_msgs)
-      
+
 ament_target_dependencies(sample_node_3
       vtr_storage
       test_msgs)
