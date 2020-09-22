@@ -2,7 +2,7 @@
 
 #include <rcutils/time.h>
 #include <any>
-#include <boost/optional.hpp>
+#include <optional>
 #include <iostream>
 
 namespace vtr {
@@ -47,35 +47,35 @@ class VTRMessage {
   }
 
   TimeStamp get_timestamp() const {
-    if (timestamp_ == boost::none) {
+    if (!timestamp_.has_value()) {
       throw std::runtime_error(
           "Attempted to get uninitialized timestamp of a VTRMessage");
     } else {
-      return timestamp_.get();
+      return timestamp_.value();
     }
   }
 
-  bool has_timestamp() const { return timestamp_ != boost::none; }
+  bool has_timestamp() const { return timestamp_.has_value(); }
 
   void set_timestamp(TimeStamp new_timestamp) { timestamp_ = new_timestamp; }
 
   int32_t get_index() const {
-    if (database_index_ == boost::none) {
+    if (!database_index_.has_value()) {
       throw std::runtime_error(
           "Attempted to get uninitialized timestamp of a VTRMessage");
     } else {
-      return database_index_.get();
+      return database_index_.value();
     }
   }
 
-  bool has_index() const { return database_index_ != boost::none; }
+  bool has_index() const { return database_index_.has_value(); }
 
   void set_index(int32_t new_index) { database_index_ = new_index; }
 
  private:
   std::any message_;
-  boost::optional<int32_t> database_index_;
-  boost::optional<rcutils_time_point_value_t> timestamp_;
+  std::optional<int32_t> database_index_;
+  std::optional<rcutils_time_point_value_t> timestamp_;
 };
 
 }  // namespace storage
