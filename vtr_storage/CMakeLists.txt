@@ -23,7 +23,10 @@ find_package(vtr_messages REQUIRED)
 # Libraries
 file(
   GLOB_RECURSE SRC
-  src/*.cpp
+  src/data_bubble.cpp
+  src/data_stream_base.cpp
+  src/random_access_reader.cpp
+  src/sequential_append_writer.cpp
 )
 add_library(${PROJECT_NAME} ${SRC})
 ament_target_dependencies(${PROJECT_NAME}
@@ -47,7 +50,7 @@ target_include_directories(${PROJECT_NAME}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-ament_export_targets(export_${PROJECT_NAME})
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   pluginlib
   rosbag2_storage
@@ -63,6 +66,8 @@ ament_export_dependencies(
   vtr_logging
   vtr_messages
 )
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
 
 install(
   DIRECTORY include/
@@ -77,5 +82,13 @@ install(
   RUNTIME DESTINATION bin/${PROJECT_NAME}
   INCLUDES DESTINATION include
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(read_write_test test/read_write_append_test.cpp)
+  target_link_libraries(read_write_test ${PROJECT_NAME})
+  ament_add_gtest(data_bubble_test test/data_bubble_test.cpp)
+  target_link_libraries(data_bubble_test ${PROJECT_NAME})
+endif()
 
 ament_package()

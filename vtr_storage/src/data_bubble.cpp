@@ -37,6 +37,8 @@ bool DataBubble::isLoaded(TimeStamp time) {
   return time_it != time_map_.end() && isLoaded(time_it->second);
 }
 
+bool DataBubble::isLoaded(VTRTimeStamp time) { return isLoaded(toTimeStamp(time)); }
+
 void DataBubble::load() {
   if (is_loaded_ == true) {
     return;
@@ -52,7 +54,8 @@ void DataBubble::load() {
   }
   if (!loadFromIndex_ && !loadFromTime_) {
     is_loaded_ = false;
-    LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";
+    // throw std::runtime_error("DataBubble::load() called but no indices were set in bubble.");
+    // LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";
   }
 }
 
@@ -150,6 +153,8 @@ void DataBubble::loadTime(TimeStamp time) {
   // }
 }
 
+void DataBubble::load(VTRTimeStamp time) { return loadTime(toTimeStamp(time)); }
+
 void DataBubble::loadTime(TimeStamp time0, TimeStamp time1) {
   auto anytype_message_vector =
       data_stream_->readAtTimestampRange(time0, time1);
@@ -193,6 +198,10 @@ void DataBubble::loadTime(TimeStamp time0, TimeStamp time1) {
   // }
 }
 
+void DataBubble::load(VTRTimeStamp time0, VTRTimeStamp time1) {
+  return loadTime(toTimeStamp(time0), toTimeStamp(time1));
+}
+
 void DataBubble::unload() {
   is_loaded_ = false;
   memoryUsageBytes_ = 0;
@@ -224,6 +233,10 @@ VTRMessage DataBubble::retrieve(int32_t local_idx) {
     throw std::out_of_range("DataBubble has no data at this index.");
 
   return data_map_[local_idx];
+}
+
+VTRMessage DataBubble::retrieve(VTRTimeStamp time) {
+  return retrieveTime(toTimeStamp(time));
 }
 
 VTRMessage DataBubble::retrieveTime(TimeStamp time) {
@@ -283,6 +296,10 @@ bool DataBubble::setTimeIndices(TimeStamp time_begin, TimeStamp time_end) {
   indices_.stop_time = time_end;
   loadFromTime_ = true;
   return true;
+}
+
+bool DataBubble::setTimeIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end) {
+  return setTimeIndices(toTimeStamp(time_begin), toTimeStamp(time_end));
 }
 
 }  // namespace storage

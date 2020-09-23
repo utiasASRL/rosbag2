@@ -67,15 +67,13 @@ class DataBubble {
   /// \brief loads a specific message based on a time tag into memory.
   /// \param time The time stamp of the message to be loaded.
   void loadTime(TimeStamp time);
-  void load(VTRTimeStamp time) { return loadTime(toTimeStamp(time)); }
+  void load(VTRTimeStamp time);
 
   /// \brief loads a range of messages based on time tags into memory.
   /// \param time Begining time stamp of the message to be loaded.
   /// \param time End time stamp of the message to be loaded.
   void loadTime(TimeStamp time0, TimeStamp time1);
-  void load(VTRTimeStamp time0, VTRTimeStamp time1) {
-    return loadTime(toTimeStamp(time0), toTimeStamp(time1));
-  }
+  void load(VTRTimeStamp time0, VTRTimeStamp time1);
 
   /// \brief unloads all data associated with the vertex.
   void unload();
@@ -100,7 +98,8 @@ class DataBubble {
   /// \brief Checks to see if a message is loaded based on time.
   /// \return true if the message is loaded, false otherwise.
   bool isLoaded(TimeStamp time);
-  bool isLoaded(VTRTimeStamp time) { return isLoaded(toTimeStamp(time)); }
+
+  bool isLoaded(VTRTimeStamp time);
 
   /// \brief Inserts a message into the bubble.
   void insert(const VTRMessage& message);
@@ -108,9 +107,8 @@ class DataBubble {
   /// \brief Retrieves a reference to the message.
   /// \param the index of the message.
   VTRMessage retrieve(int32_t local_idx);
-  VTRMessage retrieve(VTRTimeStamp time) {
-    return retrieveTime(toTimeStamp(time));
-  }
+
+  VTRMessage retrieve(VTRTimeStamp time);
 
   /// \brief Retrieves a reference to the message.
   /// \param The timestamp of the message.
@@ -125,9 +123,8 @@ class DataBubble {
   /// \param The start time of this bubble.
   /// \param The end time of this bubble.
   bool setTimeIndices(TimeStamp time_begin, TimeStamp time_end);
-  bool setTimeIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end) {
-    return setTimeIndices(toTimeStamp(time_begin), toTimeStamp(time_end));
-  }
+
+  bool setTimeIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end);
 
   /// \brief returns the number of bytes being used by this bubble.
   /// \param the number of bytes being used by this bubble.
@@ -142,7 +139,7 @@ class DataBubble {
   DataMap::iterator end() { return data_map_.end(); }
 
  private:
-  TimeStamp toTimeStamp(const VTRTimeStamp& time) {
+  inline TimeStamp toTimeStamp(const VTRTimeStamp& time) {
     return static_cast<TimeStamp>(time.nanoseconds_since_epoch);
   }
   /// \brief A pointer to the Robochunk stream.

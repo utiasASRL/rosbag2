@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>vtr_storage</name>
   <version>0.3.2</version>
   <description>C++ ROSBag2 client library</description>
@@ -22,6 +22,8 @@
 
   <depend>vtr_logging</depend>
   <depend>vtr_messages</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
