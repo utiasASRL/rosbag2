@@ -2,7 +2,7 @@
 
 #include <any>
 #include <utility>
-
+#include <vtr_messages/msg/rig_calibration.hpp>
 #include "vtr_storage/data_stream_base.hpp"
 #include "vtr_storage/message.hpp"
 #include "vtr_storage/sequential_append_writer.hpp"
@@ -47,6 +47,13 @@ class DataStreamWriter : public DataStreamWriterBase {
   rosbag2_storage::TopicMetadata tm_;
   std::shared_ptr<SequentialAppendWriter> writer_;
 };
+
+class DataStreamWriterCalibration : public DataStreamWriter<vtr_messages::msg::RigCalibration> {
+ public:
+  DataStreamWriterCalibration(const std::string &data_directory_string)
+  : DataStreamWriter(data_directory_string, CALIBRATION_FOLDER, false) {}
+};
+
 }  // namespace storage
 }  // namespace vtr
 

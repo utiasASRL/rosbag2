@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include <vtr_messages/msg/rig_calibration.hpp>
 #include "vtr_storage/data_stream_base.hpp"
 #include "vtr_storage/message.hpp"
 #include "vtr_storage/random_access_reader.hpp"
@@ -26,6 +27,14 @@ class DataStreamReaderBase : public DataStreamBase {
   virtual std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
   readAtTimestampRange(rcutils_time_point_value_t time_begin,
                        rcutils_time_point_value_t time_end) = 0;
+    
+  std::shared_ptr<vtr_messages::msg::RigCalibration> fetchCalibration();
+
+ protected:
+  rclcpp::Serialization<vtr_messages::msg::RigCalibration> calibration_serialization_;
+  std::shared_ptr<RandomAccessReader> calibration_reader_;
+  bool calibration_fetched_ = false;
+  std::shared_ptr<vtr_messages::msg::RigCalibration> calibration_msg_;
 };
 
 template <typename MessageType>

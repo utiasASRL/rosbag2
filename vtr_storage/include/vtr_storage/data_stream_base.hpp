@@ -15,6 +15,8 @@
 namespace vtr {
 namespace storage {
 
+constexpr const char CALIBRATION_FOLDER[] = "calibration";
+
 class DataStreamBase {
  public:
   DataStreamBase(const std::string &data_directory_string,
@@ -25,6 +27,7 @@ class DataStreamBase {
   rosbag2_cpp::StorageOptions storage_options_;
   rosbag2_cpp::ConverterOptions converter_options_;
 
+  rcpputils::fs::path base_directory_;
   rcpputils::fs::path data_directory_;
   std::string stream_name_;
   bool opened_;

@@ -55,7 +55,7 @@ void DataBubble::load() {
   if (!loadFromIndex_ && !loadFromTime_) {
     is_loaded_ = false;
     // throw std::runtime_error("DataBubble::load() called but no indices were set in bubble.");
-    // LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";
+    // LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";  // ToDo: this still doesn't build
   }
 }
 

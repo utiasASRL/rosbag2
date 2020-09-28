@@ -27,6 +27,7 @@ file(
   src/data_stream_base.cpp
   src/random_access_reader.cpp
   src/sequential_append_writer.cpp
+  src/data_stream_reader.cpp
 )
 add_library(${PROJECT_NAME} ${SRC})
 ament_target_dependencies(${PROJECT_NAME}
@@ -85,10 +86,12 @@ install(
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(read_write_test test/read_write_append_test.cpp)
-  target_link_libraries(read_write_test ${PROJECT_NAME})
+  ament_add_gtest(read_write_append_test test/read_write_append_test.cpp)
+  target_link_libraries(read_write_append_test ${PROJECT_NAME})
   ament_add_gtest(data_bubble_test test/data_bubble_test.cpp)
   target_link_libraries(data_bubble_test ${PROJECT_NAME})
+  ament_add_gtest(read_write_calibration_test test/read_write_calibration_test.cpp)
+  target_link_libraries(read_write_calibration_test ${PROJECT_NAME})
 endif()
 
 ament_package()

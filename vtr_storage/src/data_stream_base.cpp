@@ -6,7 +6,8 @@ namespace storage {
 
 DataStreamBase::DataStreamBase(const std::string &data_directory_string,
                                const std::string &stream_name)
-    : data_directory_(rcpputils::fs::path(data_directory_string)),
+    : base_directory_(rcpputils::fs::path(data_directory_string)),
+      data_directory_(rcpputils::fs::path(data_directory_string)),
       stream_name_(stream_name),
       opened_(false) {
   if (stream_name != "") {
