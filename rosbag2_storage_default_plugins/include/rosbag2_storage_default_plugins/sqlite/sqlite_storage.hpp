@@ -112,6 +112,7 @@ private:
   ReadQueryResult message_result_ {nullptr};
   ReadQueryResult::Iterator current_message_row_ {
     nullptr, SqliteStatementWrapper::QueryResult<>::Iterator::POSITION_END};
+  ModifiedReadQueryResult::Iterator modified_current_message_row_
   std::unordered_map<std::string, int> topics_;
   std::vector<rosbag2_storage::TopicMetadata> all_topics_and_types_;
   std::string relative_path_;

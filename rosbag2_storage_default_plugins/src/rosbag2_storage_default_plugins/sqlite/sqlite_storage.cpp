@@ -204,7 +204,7 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_next(
 
 std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_timestamp(rcutils_time_point_value_t timestamp)
 {
-  auto bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
 
   auto read_statement = database_->prepare_statement(
     "SELECT data, timestamp, topics.name, messages.id "
@@ -221,11 +221,13 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_ti
   // }
   
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
-  bag_message->serialized_data = std::get<0>(*current_message_row);
-  bag_message->time_stamp = std::get<1>(*current_message_row);
-  bag_message->topic_name = std::get<2>(*current_message_row);
-  bag_message->database_index = std::get<3>(*current_message_row);
-
+  if(current_message_row != message_result.end()) {  // message exists
+    bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+    bag_message->serialized_data = std::get<0>(*current_message_row);
+    bag_message->time_stamp = std::get<1>(*current_message_row);
+    bag_message->topic_name = std::get<2>(*current_message_row);
+    bag_message->database_index = std::get<3>(*current_message_row);
+  }
   // if(++current_message_row != message_result.end()) {
   //   throw std::runtime_error("More than one message at the same timestamp!");
   // }
@@ -234,7 +236,7 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_ti
 }
 
 std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_index(int32_t index) {
-  auto bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
 
   auto read_statement = database_->prepare_statement(
     "SELECT data, timestamp, topics.name, messages.id "
@@ -250,14 +252,13 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_in
   // }
   
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
-  bag_message->serialized_data = std::get<0>(*current_message_row);
-  bag_message->time_stamp = std::get<1>(*current_message_row);
-  bag_message->topic_name = std::get<2>(*current_message_row);
-  bag_message->database_index = std::get<3>(*current_message_row);
-
-  // if(++current_message_row != message_result.end()) {
-  //   throw std::runtime_error("More than one message at the same id!");
-  // }
+  if(current_message_row != message_result.end()) {  // message exists
+    bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+    bag_message->serialized_data = std::get<0>(*current_message_row);
+    bag_message->time_stamp = std::get<1>(*current_message_row);
+    bag_message->topic_name = std::get<2>(*current_message_row);
+    bag_message->database_index = std::get<3>(*current_message_row);
+  }
 
   return bag_message;
 }
@@ -275,8 +276,8 @@ std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessag
 
   auto bag_message_vector = std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
 
-  // ReadQueryResult::Iterator current_message_row;
-  for (ModifiedReadQueryResult::Iterator current_message_row = message_result.begin(); current_message_row != message_result.end(); ++current_message_row) {
+  ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
+  for (; current_message_row != message_result.end(); ++current_message_row) {
     bag_message_vector->push_back(std::make_shared<rosbag2_storage::SerializedBagMessage>());
     bag_message_vector->back()->serialized_data = std::get<0>(*current_message_row);
     bag_message_vector->back()->time_stamp = std::get<1>(*current_message_row);
@@ -299,8 +300,8 @@ std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessag
   
   auto bag_message_vector = std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
 
-  // ReadQueryResult::Iterator current_message_row;
-  for (ModifiedReadQueryResult::Iterator current_message_row = message_result.begin(); current_message_row != message_result.end(); ++current_message_row) {
+  ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
+  for (; current_message_row != message_result.end(); ++current_message_row) {
     bag_message_vector->push_back(std::make_shared<rosbag2_storage::SerializedBagMessage>());
     bag_message_vector->back()->serialized_data = std::get<0>(*current_message_row);
     bag_message_vector->back()->time_stamp = std::get<1>(*current_message_row);

@@ -35,17 +35,20 @@ void DataStreamReader<MessageType>::openAndGetMessageType() {
 template <typename MessageType>
 std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::convertBagMessage(
     std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message) {
-  auto extracted_msg = std::make_shared<MessageType>();
-  rclcpp::SerializedMessage serialized_msg;
-  rclcpp::SerializedMessage extracted_serialized_msg(
-      *bag_message->serialized_data);
-  this->serialization_.deserialize_message(&extracted_serialized_msg,
-                                           extracted_msg.get());
+  std::shared_ptr<VTRMessage> anytype_msg;
+  if (bag_message) {
+    auto extracted_msg = std::make_shared<MessageType>();
+    rclcpp::SerializedMessage serialized_msg;
+    rclcpp::SerializedMessage extracted_serialized_msg(
+        *bag_message->serialized_data);
+    this->serialization_.deserialize_message(&extracted_serialized_msg,
+                                            extracted_msg.get());
 
-  auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
-  anytype_msg->set_index(bag_message->database_index);
-  if (bag_message->time_stamp != NO_TIMESTAMP_VALUE) {
-    anytype_msg->set_timestamp(bag_message->time_stamp);
+    anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
+    anytype_msg->set_index(bag_message->database_index);
+    if (bag_message->time_stamp != NO_TIMESTAMP_VALUE) {
+      anytype_msg->set_timestamp(bag_message->time_stamp);
+    }
   }
   return anytype_msg;
 }

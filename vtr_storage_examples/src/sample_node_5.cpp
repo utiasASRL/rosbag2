@@ -50,4 +50,9 @@ int main() {
   for (auto message : *bag_message_vector) {
     std::cout << message->template get<TestMsgT>().float64_value << std::endl;
   }
+
+  auto anytype_msg = reader.readAtIndex(2);
+  std::cout << (anytype_msg.get() == nullptr) << std::endl;
+  auto anytype_msg2 = reader.readAtIndex(9000);
+  std::cout << (anytype_msg2.get() == nullptr) << std::endl;
 }

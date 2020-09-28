@@ -47,9 +47,12 @@ class DataStreamReader : public DataStreamReaderBase {
   void openAndGetMessageType() override;
   void close() override;
 
+  // returns a nullptr if no data exist at the specified index/timestamp
   std::shared_ptr<VTRMessage> readAtIndex(int32_t index) override;
   std::shared_ptr<VTRMessage> readAtTimestamp(
       rcutils_time_point_value_t time) override;
+
+  // returns an empty vector if no data exist at the specified range
   std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>> readAtIndexRange(
       int32_t index_begin, int32_t index_end) override;
   std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
