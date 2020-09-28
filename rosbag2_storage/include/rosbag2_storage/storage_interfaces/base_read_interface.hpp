@@ -55,6 +55,12 @@ public:
     return nullptr;
   }
 
+  virtual bool seek_by_index(int32_t index) { index++; return false; }
+
+  virtual bool seek_by_timestamp(rcutils_time_point_value_t timestamp) { timestamp++; return false; }
+
+  virtual std::shared_ptr<rosbag2_storage::SerializedBagMessage> modified_read_next() { return nullptr; }
+
   virtual std::vector<TopicMetadata> get_all_topics_and_types() = 0;
 };
 

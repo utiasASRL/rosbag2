@@ -202,6 +202,48 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_next(
   return bag_message;
 }
 
+bool SqliteStorage::seek_by_index(int32_t index)
+{
+  auto read_statement = database_->prepare_statement(
+    "SELECT data, timestamp, topics.name, messages.id "
+    "FROM messages JOIN topics ON messages.topic_id = topics.id "
+    "WHERE messages.id >= " + std::to_string(index) + " "
+    "ORDER BY messages.timestamp;");
+  modified_message_result_ = read_statement->execute_query<
+    std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
+  modified_current_message_row_ = modified_message_result_.begin();
+  return modified_current_message_row_ != modified_message_result_.end();
+}
+
+bool SqliteStorage::seek_by_timestamp(rcutils_time_point_value_t timestamp)
+{
+  auto read_statement = database_->prepare_statement(
+    "SELECT data, timestamp, topics.name, messages.id "
+    "FROM messages JOIN topics ON messages.topic_id = topics.id "
+    "WHERE messages.timestamp >= " + std::to_string(timestamp) + " "
+    "ORDER BY messages.timestamp;");
+  modified_message_result_ = read_statement->execute_query<
+    std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
+  modified_current_message_row_ = modified_message_result_.begin();
+  return modified_current_message_row_ != modified_message_result_.end();
+}
+
+std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::modified_read_next()
+{
+  
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
+  if (modified_current_message_row_ != modified_message_result_.end()) {
+    bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+    bag_message->serialized_data = std::get<0>(*modified_current_message_row_);
+    bag_message->time_stamp = std::get<1>(*modified_current_message_row_);
+    bag_message->topic_name = std::get<2>(*modified_current_message_row_);
+    bag_message->database_index = std::get<3>(*modified_current_message_row_);
+    ++modified_current_message_row_;
+  }
+
+  return bag_message;
+}
+
 std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_timestamp(rcutils_time_point_value_t timestamp)
 {
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;

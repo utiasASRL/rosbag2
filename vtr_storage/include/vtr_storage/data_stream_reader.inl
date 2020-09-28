@@ -19,6 +19,7 @@ template <typename MessageType>
 void DataStreamReader<MessageType>::close() {
   reader_.reset();
   this->opened_ = false;
+  seeked_ = false;
 }
 
 template <typename MessageType>
@@ -106,5 +107,29 @@ DataStreamReader<MessageType>::readAtTimestampRange(
   return deserialized_bag_message_vector;
 }
 
+template <typename MessageType>
+bool DataStreamReader<MessageType>::seekByIndex(
+    int32_t index) {
+  openAndGetMessageType();
+  seeked_ = true;
+  return reader_->seek_by_index(index);
+}
+
+template <typename MessageType>
+bool DataStreamReader<MessageType>::seekByTimestamp(
+    rcutils_time_point_value_t time) {
+  openAndGetMessageType();
+  seeked_ = true;
+  return reader_->seek_by_timestamp(time);
+}
+
+template <typename MessageType>
+std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::readNextFromSeek() {
+  if (!seeked_) {
+    seekByIndex(1);  // read the whole database
+  }
+  auto bag_message = reader_->read_next_from_seek();
+  return convertBagMessage(bag_message);
+}
 }  // namespace storage
 }  // namespace vtr

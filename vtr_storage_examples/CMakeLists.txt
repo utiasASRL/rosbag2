@@ -44,6 +44,11 @@ target_include_directories(sample_node_5 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+add_executable(sample_node_6 src/sample_node_6.cpp)
+target_include_directories(sample_node_5 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 ament_target_dependencies(sample_node_2
       vtr_storage
       test_msgs)
@@ -59,7 +64,11 @@ ament_target_dependencies(sample_node_4
 ament_target_dependencies(sample_node_5
       vtr_storage
       test_msgs)
-install(TARGETS sample_node_2 sample_node_3 sample_node_4 sample_node_5
+
+ament_target_dependencies(sample_node_6
+      vtr_storage
+      test_msgs)
+install(TARGETS sample_node_2 sample_node_3 sample_node_4 sample_node_5 sample_node_6
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

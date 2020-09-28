@@ -93,6 +93,12 @@ public:
 
   void reset_filter() override;
 
+  bool seek_by_index(int32_t index) override;
+
+  bool seek_by_timestamp(rcutils_time_point_value_t timestamp) override;
+
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> modified_read_next() override;
+
 private:
   void initialize();
   void prepare_for_writing();
@@ -110,9 +116,11 @@ private:
   SqliteStatement write_statement_ {};
   SqliteStatement read_statement_ {};
   ReadQueryResult message_result_ {nullptr};
+  ModifiedReadQueryResult modified_message_result_ {nullptr};
   ReadQueryResult::Iterator current_message_row_ {
     nullptr, SqliteStatementWrapper::QueryResult<>::Iterator::POSITION_END};
-  ModifiedReadQueryResult::Iterator modified_current_message_row_
+  ModifiedReadQueryResult::Iterator modified_current_message_row_ {
+    nullptr, SqliteStatementWrapper::QueryResult<>::Iterator::POSITION_END};
   std::unordered_map<std::string, int> topics_;
   std::vector<rosbag2_storage::TopicMetadata> all_topics_and_types_;
   std::string relative_path_;

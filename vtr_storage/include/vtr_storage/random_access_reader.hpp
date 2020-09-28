@@ -52,7 +52,7 @@ class RandomAccessReader : public rosbag2_cpp::readers::SequentialReader {
       rcutils_time_point_value_t timestamp);
 
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> read_at_index(
-      uint32_t index);
+      int32_t index);
 
   std::shared_ptr<
       std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
@@ -61,7 +61,13 @@ class RandomAccessReader : public rosbag2_cpp::readers::SequentialReader {
 
   std::shared_ptr<
       std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
-  read_at_index_range(uint32_t index_begin, uint32_t index_end);
+  read_at_index_range(int32_t index_begin, int32_t index_end);
+
+  bool seek_by_index(int32_t index);
+
+  bool seek_by_timestamp(rcutils_time_point_value_t timestamp);
+
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> read_next_from_seek();
 
  protected:
   std::string stream_name_;

@@ -59,8 +59,9 @@ class DataStreamReader : public DataStreamReaderBase {
   readAtTimestampRange(rcutils_time_point_value_t time_begin,
                        rcutils_time_point_value_t time_end) override;
 
-  // next() isn't needed for now due to ranged random access. Can add in if
-  // necessary
+  bool seekByIndex(int32_t index);
+  bool seekByTimestamp(rcutils_time_point_value_t timestamp);
+  std::shared_ptr<VTRMessage> readNextFromSeek();
 
  protected:
   std::shared_ptr<VTRMessage> convertBagMessage(
@@ -68,6 +69,7 @@ class DataStreamReader : public DataStreamReaderBase {
 
   rclcpp::Serialization<MessageType> serialization_;
   std::shared_ptr<RandomAccessReader> reader_;
+  bool seeked_ = false;
 };
 
 }  // namespace storage

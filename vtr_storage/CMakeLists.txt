@@ -94,6 +94,8 @@ if(BUILD_TESTING)
   target_link_libraries(read_write_calibration_test ${PROJECT_NAME})
   ament_add_gtest(read_write_nullptr_test test/read_write_nullptr_test.cpp)
   target_link_libraries(read_write_nullptr_test ${PROJECT_NAME})
+  ament_add_gtest(read_seek_test test/read_seek_test.cpp)
+  target_link_libraries(read_seek_test ${PROJECT_NAME})
 endif()
 
 ament_package()
