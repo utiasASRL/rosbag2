@@ -28,8 +28,8 @@ TEST(VTRStorage, readWriteCalibration) {
   // write a calibration msg
   vtr_messages::msg::RigCalibration calibration_msg;
   vtr_messages::msg::CameraCalibration intrinsics;
-  intrinsics.k = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-  calibration_msg.intrinsics[0] = intrinsics;
+  intrinsics.k_mat = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  calibration_msg.intrinsics.push_back(intrinsics);
   vtr::storage::DataStreamWriterCalibration calibration_writer(working_dir);
   calibration_writer.write(calibration_msg);
 

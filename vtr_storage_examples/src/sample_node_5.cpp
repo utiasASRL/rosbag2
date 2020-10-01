@@ -27,8 +27,8 @@ int main() {
   // write a dummy calibration
   vtr_messages::msg::RigCalibration calibration_msg;
   vtr_messages::msg::CameraCalibration intrinsics;
-  intrinsics.k = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-  calibration_msg.intrinsics[0] = intrinsics;
+  intrinsics.k_mat = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  calibration_msg.intrinsics.push_back(intrinsics);
   vtr::storage::DataStreamWriterCalibration calibration_writer(base_url);
   calibration_writer.write(calibration_msg);
 
@@ -42,7 +42,7 @@ int main() {
   // read calibration and data
   vtr::storage::DataStreamReader<TestMsgT> reader(base_url, stream_name);
   std::shared_ptr<vtr_messages::msg::RigCalibration> calibration = reader.fetchCalibration();
-  for (auto num : calibration->intrinsics[0].k) {
+  for (auto num : calibration->intrinsics[0].k_mat) {
     std::cout << num << std::endl;
   }
   auto bag_message_vector = reader.readAtIndexRange(1, 9);
