@@ -25,7 +25,7 @@ void DataStreamReader<MessageType>::close() {
 template <typename MessageType>
 void DataStreamReader<MessageType>::openAndGetMessageType() {
   if (this->opened_ == false) {
-    if(!data_directory_.exists()) {
+    if (!data_directory_.exists()) {
       throw NoBagExistsException(data_directory_);
     }
     reader_ = std::make_shared<RandomAccessReader>(this->stream_name_);
@@ -46,7 +46,7 @@ std::shared_ptr<VTRMessage> DataStreamReader<MessageType>::convertBagMessage(
     rclcpp::SerializedMessage extracted_serialized_msg(
         *bag_message->serialized_data);
     this->serialization_.deserialize_message(&extracted_serialized_msg,
-                                            extracted_msg.get());
+                                             extracted_msg.get());
 
     anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
     anytype_msg->set_index(bag_message->database_index);
@@ -111,8 +111,7 @@ DataStreamReader<MessageType>::readAtTimestampRange(
 }
 
 template <typename MessageType>
-bool DataStreamReader<MessageType>::seekByIndex(
-    int32_t index) {
+bool DataStreamReader<MessageType>::seekByIndex(int32_t index) {
   openAndGetMessageType();
   seeked_ = true;
   return reader_->seek_by_index(index);

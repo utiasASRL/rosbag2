@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vtr_storage_common.hpp"
 #include "rosbag2_cpp/converter_options.hpp"
 #include "rosbag2_cpp/storage_options.hpp"
+#include "vtr_storage_common.hpp"
 
 namespace vtr {
 namespace storage {

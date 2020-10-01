@@ -180,12 +180,14 @@ bool RandomAccessReader::seek_by_index(int32_t index) {
   return storage_ && storage_->seek_by_index(index);
 }
 
-bool RandomAccessReader::seek_by_timestamp(rcutils_time_point_value_t timestamp) {
+bool RandomAccessReader::seek_by_timestamp(
+    rcutils_time_point_value_t timestamp) {
   return storage_ && storage_->seek_by_timestamp(timestamp);
 }
 
-std::shared_ptr<rosbag2_storage::SerializedBagMessage> RandomAccessReader::read_next_from_seek() {
- if (storage_) {
+std::shared_ptr<rosbag2_storage::SerializedBagMessage>
+RandomAccessReader::read_next_from_seek() {
+  if (storage_) {
     auto message = storage_->modified_read_next();
     return (converter_ && message) ? converter_->convert(message) : message;
   }

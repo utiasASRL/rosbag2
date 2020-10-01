@@ -2,8 +2,8 @@
 
 #include <rcutils/time.h>
 #include <any>
-#include <optional>
 #include <iostream>
+#include <optional>
 
 namespace vtr {
 namespace storage {

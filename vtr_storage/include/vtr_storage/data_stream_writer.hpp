@@ -48,10 +48,11 @@ class DataStreamWriter : public DataStreamWriterBase {
   std::shared_ptr<SequentialAppendWriter> writer_;
 };
 
-class DataStreamWriterCalibration : public DataStreamWriter<vtr_messages::msg::RigCalibration> {
+class DataStreamWriterCalibration
+    : public DataStreamWriter<vtr_messages::msg::RigCalibration> {
  public:
   DataStreamWriterCalibration(const std::string &data_directory_string)
-  : DataStreamWriter(data_directory_string, CALIBRATION_FOLDER, false) {}
+      : DataStreamWriter(data_directory_string, CALIBRATION_FOLDER, false) {}
 };
 
 }  // namespace storage

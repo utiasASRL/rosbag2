@@ -37,7 +37,9 @@ bool DataBubble::isLoaded(TimeStamp time) {
   return time_it != time_map_.end() && isLoaded(time_it->second);
 }
 
-bool DataBubble::isLoaded(VTRTimeStamp time) { return isLoaded(toTimeStamp(time)); }
+bool DataBubble::isLoaded(VTRTimeStamp time) {
+  return isLoaded(toTimeStamp(time));
+}
 
 void DataBubble::load() {
   if (is_loaded_ == true) {
@@ -47,15 +49,16 @@ void DataBubble::load() {
   if (loadFromIndex_) {
     load(indices_.start_index, indices_.stop_index);
     is_loaded_ = true;
-  } 
+  }
   if (loadFromTime_) {
     loadTime(indices_.start_time, indices_.stop_time);
     is_loaded_ = true;
   }
   if (!loadFromIndex_ && !loadFromTime_) {
     is_loaded_ = false;
-    // throw std::runtime_error("DataBubble::load() called but no indices were set in bubble.");
-    // LOG(ERROR) << __func__ << "ERROR No indices provided, call setIndices, or setTimeIndices";  // ToDo: this still doesn't build
+    // throw std::runtime_error("DataBubble::load() called but no indices were
+    // set in bubble."); LOG(ERROR) << __func__ << "ERROR No indices provided,
+    // call setIndices, or setTimeIndices";  // ToDo: this still doesn't build
   }
 }
 
@@ -298,7 +301,8 @@ bool DataBubble::setTimeIndices(TimeStamp time_begin, TimeStamp time_end) {
   return true;
 }
 
-bool DataBubble::setTimeIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end) {
+bool DataBubble::setTimeIndices(VTRTimeStamp time_begin,
+                                VTRTimeStamp time_end) {
   return setTimeIndices(toTimeStamp(time_begin), toTimeStamp(time_end));
 }
 
