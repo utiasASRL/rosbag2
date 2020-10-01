@@ -1,21 +1,11 @@
 #pragma once
 
-#include <cstdio>
-#include <iostream>
-#include <memory>
-#include <string>
-
-#include "rclcpp/serialization.hpp"
-#include "rclcpp/serialized_message.hpp"
-#include "rcpputils/filesystem_helper.hpp"
-#include "rcutils/time.h"
+#include "vtr_storage_common.hpp"
 #include "rosbag2_cpp/converter_options.hpp"
 #include "rosbag2_cpp/storage_options.hpp"
 
 namespace vtr {
 namespace storage {
-
-constexpr const char CALIBRATION_FOLDER[] = "calibration";
 
 class DataStreamBase {
  public:

@@ -25,6 +25,9 @@ void DataStreamReader<MessageType>::close() {
 template <typename MessageType>
 void DataStreamReader<MessageType>::openAndGetMessageType() {
   if (this->opened_ == false) {
+    if(!data_directory_.exists()) {
+      throw NoBagExistsException(data_directory_);
+    }
     reader_ = std::make_shared<RandomAccessReader>(this->stream_name_);
     reader_->open(this->storage_options_, this->converter_options_);
     this->opened_ = true;
