@@ -26,13 +26,11 @@ TEST(VTRStorage, readWriteNullptr) {
   TestMsgT test_msg;
 
   // write data
-  vtr::storage::DataStreamWriter<TestMsgT> writer(
-      working_dir,
-      stream_name);
+  vtr::storage::DataStreamWriter<TestMsgT> writer(working_dir, stream_name);
   int64_t timestamp;
   for (int i = 1; i <= 10; i++) {
     test_msg.float64_value = i * 10;
-    timestamp = i*2000;
+    timestamp = i * 2000;
     auto message = vtr::storage::VTRMessage(test_msg);
     message.set_timestamp(timestamp);
     writer.write(message);
@@ -52,17 +50,17 @@ TEST(VTRStorage, readWriteNullptr) {
   EXPECT_TRUE(reader.readAtTimestamp(10001).get() == nullptr);
 
   // reading ranges
-  EXPECT_EQ(reader.readAtIndexRange(1, 10)->size(), 10);
-  EXPECT_EQ(reader.readAtIndexRange(0, 10)->size(), 10);
-  EXPECT_EQ(reader.readAtIndexRange(9, 11)->size(), 2);
-  EXPECT_EQ(reader.readAtIndexRange(10, 12)->size(), 1);
-  EXPECT_EQ(reader.readAtIndexRange(11, 12)->size(), 0);
+  EXPECT_EQ(reader.readAtIndexRange(1, 10)->size(), (unsigned)10);
+  EXPECT_EQ(reader.readAtIndexRange(0, 10)->size(), (unsigned)10);
+  EXPECT_EQ(reader.readAtIndexRange(9, 11)->size(), (unsigned)2);
+  EXPECT_EQ(reader.readAtIndexRange(10, 12)->size(), (unsigned)1);
+  EXPECT_EQ(reader.readAtIndexRange(11, 12)->size(), (unsigned)0);
 
-  EXPECT_EQ(reader.readAtTimestampRange(2000, 20000)->size(), 10);
-  EXPECT_EQ(reader.readAtTimestampRange(1000, 20000)->size(), 10);
-  EXPECT_EQ(reader.readAtTimestampRange(18000, 22000)->size(), 2);
-  EXPECT_EQ(reader.readAtTimestampRange(20000, 22000)->size(), 1);
-  EXPECT_EQ(reader.readAtTimestampRange(20001, 22000)->size(), 0);
+  EXPECT_EQ(reader.readAtTimestampRange(2000, 20000)->size(), (unsigned)10);
+  EXPECT_EQ(reader.readAtTimestampRange(1000, 20000)->size(), (unsigned)10);
+  EXPECT_EQ(reader.readAtTimestampRange(18000, 22000)->size(), (unsigned)2);
+  EXPECT_EQ(reader.readAtTimestampRange(20000, 22000)->size(), (unsigned)1);
+  EXPECT_EQ(reader.readAtTimestampRange(20001, 22000)->size(), (unsigned)0);
 }
 
 int main(int argc, char** argv) {
