@@ -14,14 +14,20 @@ using VTRTimeStamp = vtr_messages::msg::TimeStamp;
 
 /// \brief Bubble indices into a robochunk stream.
 struct ChunkIndices {
+  /// \brief constructor
+  ChunkIndices() {
+    start_index = 0;
+    stop_index = 0;
+  }
+
   /// \brief Start index into the stream.
-  int32_t start_index = 0;
+  int32_t start_index;
   /// \brief Stop index into the stream.
-  int32_t stop_index = 0;
+  int32_t stop_index;
   /// \brief Start time into the stream.
-  TimeStamp start_time = 0;
+  TimeStamp start_time;
   /// \brief Stop time into the stream.
-  TimeStamp stop_time = 0;
+  TimeStamp stop_time;
 };
 
 /// \brief DataBubble class. Container class for a specified range of messages
@@ -32,15 +38,13 @@ class DataBubble {
   using TimeMap = std::map<TimeStamp, int32_t>;
 
  public:
-  DataBubble() : loadFromIndex_(false), loadFromTime_(false) {}
+  DataBubble();
 
-  virtual ~DataBubble() { reset(); }
+  ~DataBubble();
 
   /// \brief Initializes a data bubble with a data stream.
   /// \param A pointer to the associated data stream.
-  void initialize(std::shared_ptr<DataStreamReaderBase> data_stream) {
-    data_stream_ = data_stream;
-  }
+  void initialize(std::shared_ptr<DataStreamReaderBase> data_stream);
 
   void reset();
 
@@ -53,29 +57,49 @@ class DataBubble {
   /// \param The local index.
   void load(int32_t local_idx);
 
+  /// \brief loads the specified messages into memory based on an index range.
+  /// \details This is a local index (i.e. If the bubble wraps 20 messages then
+  /// the local index is in the range (0-19))
+  /// \param The start index.
+  /// \param The end index.
+  void load(int32_t global_idx0, int32_t global_idx1);
+
   /// \brief loads a specific message based on a time tag into memory.
   /// \param time The time stamp of the message to be loaded.
   void loadTime(TimeStamp time);
-  void load(VTRTimeStamp time) { return loadTime(toTimeStamp(time)); }
+  void load(VTRTimeStamp time);
+
+  /// \brief loads a range of messages based on time tags into memory.
+  /// \param time Begining time stamp of the message to be loaded.
+  /// \param time End time stamp of the message to be loaded.
+  void loadTime(TimeStamp time0, TimeStamp time1);
+  void load(VTRTimeStamp time0, VTRTimeStamp time1);
 
   /// \brief unloads all data associated with the vertex.
   void unload();
 
+  /// \brief unloads A specific message.
+  /// \param The index of the message to unload.
+  void unload(int32_t local_idx);
+
+  /// \brief unloads A range of messages
+  /// \param The first index.
+  /// \param The last index.
+  void unload(int32_t local_idx0, int32_t local_idx1);
+
   /// \brief Gets the size of the bubble (number of messages)
   /// \return the size of the bubble.
-  int32_t size() const { return data_map_.size(); }
+  int32_t size();
 
   /// \brief Checks to see if a message is loaded based on index.
   /// \return true if the message is loaded, false otherwise.
-  bool isLoaded(int32_t idx) { return data_map_.count(idx); };
-  bool isLoaded(VTRTimeStamp time) { return isLoaded(toTimeStamp(time)); }
+  bool isLoaded(int32_t idx);
 
   /// \brief Checks to see if a message is loaded based on time.
   /// \return true if the message is loaded, false otherwise.
-  bool isLoaded(TimeStamp time) {
-    auto time_it = time_map_.find(time);  // get the index from the time map
-    return time_it != time_map_.end() && isLoaded(time_it->second);
-  }
+  bool isLoaded(TimeStamp time);
+
+  bool isLoaded(VTRTimeStamp time);
 
   /// \brief Inserts a message into the bubble.
   void insert(const VTRMessage& message);
@@ -83,9 +107,8 @@ class DataBubble {
   /// \brief Retrieves a reference to the message.
   /// \param the index of the message.
   VTRMessage retrieve(int32_t local_idx);
-  VTRMessage retrieve(VTRTimeStamp time) {
-    return retrieveTime(toTimeStamp(time));
-  }
+
+  VTRMessage retrieve(VTRTimeStamp time);
 
   /// \brief Retrieves a reference to the message.
   /// \param The timestamp of the message.
@@ -95,17 +118,20 @@ class DataBubble {
   /// \param The start index of this bubble.
   /// \param The end index of this bubble.
   bool setIndices(uint64_t index_begin, uint64_t index_end);
-  bool setIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end) {
-    return setTimeIndices(toTimeStamp(time_begin), toTimeStamp(time_end));
-  }
 
   /// \brief Sets the Time indices for this bubble.
   /// \param The start time of this bubble.
   /// \param The end time of this bubble.
   bool setTimeIndices(TimeStamp time_begin, TimeStamp time_end);
 
+  bool setTimeIndices(VTRTimeStamp time_begin, VTRTimeStamp time_end);
+
+  /// \brief returns the number of bytes being used by this bubble.
+  /// \param the number of bytes being used by this bubble.
+  const uint64_t& memoryUsageBytes() { return memoryUsageBytes_; };
+
   /// \brief provides an iterator to the begining of the bubble.
-  /// \return Begin iterator into the bubble's data.
+  /// @return Begin iterator into the bubble's data.
   DataMap::iterator begin() { return data_map_.begin(); }
 
   /// \brief provides an iterator to the end of the bubble.
@@ -113,29 +139,23 @@ class DataBubble {
   DataMap::iterator end() { return data_map_.end(); }
 
  private:
-  /// \brief loads the specified messages into memory based on an index range.
-  /// \details This is a local index (i.e. If the bubble wraps 20 messages then
-  /// the local index is in the range (0-19))
-  /// \param The start index.
-  /// \param The end index.
-  void load_(int32_t global_idx0, int32_t global_idx1);
-
-  /// \brief loads a range of messages based on time tags into memory.
-  /// \param time Begining time stamp of the message to be loaded.
-  /// \param time End time stamp of the message to be loaded.
-  void loadTime_(TimeStamp time0, TimeStamp time1);
-
-  TimeStamp toTimeStamp(const VTRTimeStamp& time) {
+  inline TimeStamp toTimeStamp(const VTRTimeStamp& time) {
     return static_cast<TimeStamp>(time.nanoseconds_since_epoch);
   }
   /// \brief A pointer to the Robochunk stream.
   std::shared_ptr<DataStreamReaderBase> data_stream_;
+  /// \brief the current end index of the bubble.
+  int32_t endIdx_;
   /// \brief The indices associated with this bubble.
   ChunkIndices indices_;
   /// \brief flag to determine if this bubble can be loaded by index.
   bool loadFromIndex_;
   /// \brief flag to determine if this bubble can be loaded by time.
   bool loadFromTime_;
+  /// \brief The number of bytes being used by the bubble.
+  uint64_t memoryUsageBytes_;
+  /// \brief If the bubble has been loaded from disk. Defaults to false
+  bool is_loaded_;
   /// \brief The map of currently loaded data.
   DataMap data_map_;
   /// \brief maps timestamps to indices in the data map.

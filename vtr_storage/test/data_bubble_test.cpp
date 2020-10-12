@@ -67,7 +67,10 @@ TEST(VTRStorage, dataBubble) {
   // std::cout << "Message: " << message.template get<TestMsgT>().float64_value << ", index: " << message.get_index() << ", timestamp: " << message.get_timestamp() << std::endl;
 
   // std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  bubble.loadTime(5000, 14500);
+  bubble.unload();
+  bubble.setTimeIndices(5000, 14500);
+  bubble.load();
+  // bubble.loadTime(5000, 14500);
   for (int time = 6000; time <= 14000; time += 2000) {
     message = bubble.retrieveTime(time);
     EXPECT_EQ(message.template get<TestMsgT>().float64_value, time/200);

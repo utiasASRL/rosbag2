@@ -54,7 +54,10 @@ int main() {
   std::cout << "Message: " << message.template get<TestMsgT>().float64_value << ", index: " << message.get_index() << ", timestamp: " << message.get_timestamp() << std::endl;
 
   std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  bubble.loadTime(5000, 14500);
+  bubble.unload();
+  bubble.setIndices(5000, 14500);
+  bubble.load();
+  // bubble.loadTime(5000, 14500);
   for (int time = 6000; time <= 14000; time += 2000) {
     auto message = bubble.retrieveTime(time);
     std::cout << "Message: " << message.template get<TestMsgT>().float64_value << ", index: " << message.get_index() << ", timestamp: " << message.get_timestamp() << std::endl;
