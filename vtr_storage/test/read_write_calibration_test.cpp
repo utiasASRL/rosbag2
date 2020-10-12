@@ -25,6 +25,17 @@ TEST(VTRStorage, readWriteCalibration) {
   using TestMsgT = test_msgs::msg::BasicTypes;
   TestMsgT test_msg;
 
+  // write data
+  vtr::storage::DataStreamWriter<TestMsgT> writer(working_dir, stream_name);
+  for (int i = 1; i <= 10; i++) {
+    test_msg.float64_value = i * 10;
+    writer.write(vtr::storage::VTRMessage(test_msg));
+  }
+
+  // attempt to read calibration, should fail
+  vtr::storage::DataStreamReader<TestMsgT> reader(working_dir, stream_name);
+  EXPECT_THROW(reader.fetchCalibration(), vtr::storage::NoBagExistsException);
+
   // write a calibration msg
   vtr_messages::msg::RigCalibration calibration_msg;
   vtr_messages::msg::CameraCalibration intrinsics;
@@ -33,15 +44,7 @@ TEST(VTRStorage, readWriteCalibration) {
   vtr::storage::DataStreamWriterCalibration calibration_writer(working_dir);
   calibration_writer.write(calibration_msg);
 
-  // write data
-  vtr::storage::DataStreamWriter<TestMsgT> writer(working_dir, stream_name);
-  for (int i = 1; i <= 10; i++) {
-    test_msg.float64_value = i * 10;
-    writer.write(vtr::storage::VTRMessage(test_msg));
-  }
-
   // read calibration and data
-  vtr::storage::DataStreamReader<TestMsgT> reader(working_dir, stream_name);
   std::shared_ptr<vtr_messages::msg::RigCalibration> calibration = reader.fetchCalibration();
   EXPECT_EQ(*calibration, calibration_msg);
 

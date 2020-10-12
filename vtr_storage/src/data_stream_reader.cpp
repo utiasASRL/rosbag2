@@ -6,6 +6,9 @@ namespace storage {
 std::shared_ptr<vtr_messages::msg::RigCalibration>
 DataStreamReaderBase::fetchCalibration() {
   if (!calibration_fetched_) {
+    if (!(base_directory_/CALIBRATION_FOLDER).exists()) {
+      throw NoBagExistsException(base_directory_/CALIBRATION_FOLDER);
+    }
     calibration_reader_ =
         std::make_shared<RandomAccessReader>(CALIBRATION_FOLDER);
 
@@ -18,15 +21,19 @@ DataStreamReaderBase::fetchCalibration() {
         calibration_serialization;
 
     auto bag_message = calibration_reader_->read_at_index(1);
-    auto extracted_msg = std::make_shared<vtr_messages::msg::RigCalibration>();
-    rclcpp::SerializedMessage serialized_msg;
-    rclcpp::SerializedMessage extracted_serialized_msg(
-        *bag_message->serialized_data);
-    calibration_serialization.deserialize_message(&extracted_serialized_msg,
-                                                  extracted_msg.get());
-    assert(extracted_msg.get() != nullptr);
-    calibration_msg_ = extracted_msg;
-    calibration_fetched_ = true;
+
+    if (bag_message) {
+      auto extracted_msg = std::make_shared<vtr_messages::msg::RigCalibration>();
+      rclcpp::SerializedMessage serialized_msg;
+      rclcpp::SerializedMessage extracted_serialized_msg(
+          *bag_message->serialized_data);
+      calibration_serialization.deserialize_message(&extracted_serialized_msg,
+                                                    extracted_msg.get());
+      calibration_msg_ = extracted_msg;
+      calibration_fetched_ = true;
+    } else {
+      throw std::runtime_error("calibration database has no messages!");
+    }
   }
 
   return calibration_msg_;
