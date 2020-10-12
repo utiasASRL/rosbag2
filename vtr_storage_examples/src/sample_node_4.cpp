@@ -55,7 +55,7 @@ int main() {
 
   std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
   bubble.unload();
-  bubble.setIndices(5000, 14500);
+  bubble.setTimeIndices(5000, 14500);
   bubble.load();
   // bubble.loadTime(5000, 14500);
   for (int time = 6000; time <= 14000; time += 2000) {
