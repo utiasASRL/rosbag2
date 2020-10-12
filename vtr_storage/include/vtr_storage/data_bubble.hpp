@@ -114,16 +114,15 @@ class DataBubble {
 
  private:
   /// \brief loads the specified messages into memory based on an index range.
-  /// \details This is a local index (i.e. If the bubble wraps 20 messages then
-  /// the local index is in the range (0-19))
+  /// \details These are global indices of messages in the database
   /// \param The start index.
   /// \param The end index.
-  void load_(int32_t global_idx0, int32_t global_idx1);
+  void loadIndexRange_(int32_t global_idx0, int32_t global_idx1);
 
   /// \brief loads a range of messages based on time tags into memory.
   /// \param time Begining time stamp of the message to be loaded.
   /// \param time End time stamp of the message to be loaded.
-  void loadTime_(TimeStamp time0, TimeStamp time1);
+  void loadTimeRange_(TimeStamp time0, TimeStamp time1);
 
   TimeStamp toTimeStamp(const VTRTimeStamp& time) {
     return static_cast<TimeStamp>(time.nanoseconds_since_epoch);
