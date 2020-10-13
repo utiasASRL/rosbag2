@@ -28,14 +28,14 @@ class DataStreamReaderBase : public DataStreamBase {
   readAtTimestampRange(rcutils_time_point_value_t time_begin,
                        rcutils_time_point_value_t time_end) = 0;
 
-  std::shared_ptr<vtr_messages::msg::RigCalibration> fetchCalibration();
+  std::shared_ptr<VTRMessage> fetchCalibration();
 
  protected:
   rclcpp::Serialization<vtr_messages::msg::RigCalibration>
       calibration_serialization_;
   std::shared_ptr<RandomAccessReader> calibration_reader_;
   bool calibration_fetched_ = false;
-  std::shared_ptr<vtr_messages::msg::RigCalibration> calibration_msg_;
+  std::shared_ptr<VTRMessage> calibration_msg_;
 };
 
 template <typename MessageType>

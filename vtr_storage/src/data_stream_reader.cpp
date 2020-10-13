@@ -3,7 +3,7 @@
 namespace vtr {
 namespace storage {
 
-std::shared_ptr<vtr_messages::msg::RigCalibration>
+std::shared_ptr<VTRMessage>
 DataStreamReaderBase::fetchCalibration() {
   if (!calibration_fetched_) {
     if (!(base_directory_/CALIBRATION_FOLDER).exists()) {
@@ -29,13 +29,17 @@ DataStreamReaderBase::fetchCalibration() {
           *bag_message->serialized_data);
       calibration_serialization.deserialize_message(&extracted_serialized_msg,
                                                     extracted_msg.get());
-      calibration_msg_ = extracted_msg;
       calibration_fetched_ = true;
+      auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
+      anytype_msg->set_index(bag_message->database_index);
+      if (bag_message->time_stamp != NO_TIMESTAMP_VALUE) {
+        anytype_msg->set_timestamp(bag_message->time_stamp);
+      }
+      calibration_msg_ = anytype_msg;
     } else {
       throw std::runtime_error("calibration database has no messages!");
     }
   }
-
   return calibration_msg_;
 }
 

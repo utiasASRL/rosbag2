@@ -41,8 +41,8 @@ int main() {
 
   // read calibration and data
   vtr::storage::DataStreamReader<TestMsgT> reader(base_url, stream_name);
-  std::shared_ptr<vtr_messages::msg::RigCalibration> calibration = reader.fetchCalibration();
-  for (auto num : calibration->intrinsics[0].k_mat) {
+  auto calibration = reader.fetchCalibration()->template get<vtr_messages::msg::RigCalibration>();
+  for (auto num : calibration.intrinsics[0].k_mat) {
     std::cout << num << std::endl;
   }
   auto bag_message_vector = reader.readAtIndexRange(1, 9);

@@ -45,8 +45,8 @@ TEST(VTRStorage, readWriteCalibration) {
   calibration_writer.write(calibration_msg);
 
   // read calibration and data
-  std::shared_ptr<vtr_messages::msg::RigCalibration> calibration = reader.fetchCalibration();
-  EXPECT_EQ(*calibration, calibration_msg);
+  auto calibration = reader.fetchCalibration()->template get<vtr_messages::msg::RigCalibration>();
+  EXPECT_EQ(calibration, calibration_msg);
 
   auto bag_message_vector = reader.readAtIndexRange(1, 9);
   int count = 1;
