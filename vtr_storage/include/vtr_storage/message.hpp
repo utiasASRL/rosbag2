@@ -8,6 +8,7 @@
 namespace vtr {
 namespace storage {
 
+using Index = int32_t;
 using TimeStamp = rcutils_time_point_value_t;
 
 constexpr TimeStamp NO_TIMESTAMP_VALUE =
@@ -22,8 +23,6 @@ class VTRMessage {
     static_assert(!std::is_same_v<std::any, T>,
                   "Attempted to initialize a VTRMessage with an std::any!");
   }
-
-  virtual ~VTRMessage() = default;
 
   template <class T>
   VTRMessage& operator=(const T& message) {
@@ -59,7 +58,7 @@ class VTRMessage {
 
   void set_timestamp(TimeStamp new_timestamp) { timestamp_ = new_timestamp; }
 
-  int32_t get_index() const {
+  Index get_index() const {
     if (!database_index_.has_value()) {
       throw std::runtime_error(
           "Attempted to get uninitialized timestamp of a VTRMessage");
@@ -70,12 +69,12 @@ class VTRMessage {
 
   bool has_index() const { return database_index_.has_value(); }
 
-  void set_index(int32_t new_index) { database_index_ = new_index; }
+  void set_index(Index new_index) { database_index_ = new_index; }
 
  private:
   std::any message_;
-  std::optional<int32_t> database_index_;
-  std::optional<rcutils_time_point_value_t> timestamp_;
+  std::optional<Index> database_index_;
+  std::optional<TimeStamp> timestamp_;
 };
 
 }  // namespace storage
