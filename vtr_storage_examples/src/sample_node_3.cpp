@@ -8,10 +8,10 @@
 #include "rcutils/time.h"
 
 #include "vtr_logging/logging_init.hpp"
-#include "vtr_storage/message.hpp"
 #include "vtr_storage/data_bubble.hpp"
 #include "vtr_storage/data_stream_reader.hpp"
 #include "vtr_storage/data_stream_writer.hpp"
+#include "vtr_storage/message.hpp"
 
 #include "test_msgs/msg/basic_types.hpp"
 
@@ -42,8 +42,9 @@ int main() {
   auto message = bubble.retrieve(3);  // 3 is local index of this bubble, which
                                       // translates to a global index of 2+3=5
   std::cout << message.template get<TestMsgT>().float64_value << std::endl;
-  bubble.reset(); // ToDo: still fixing the (probably is a) bug where the writer isn't closing properly
-  
+  bubble.reset();  // ToDo: still fixing the (probably is a) bug where the
+                   // writer isn't closing properly
+
   // test_msg.float64_value = reader.readAtIndex(5)->float64_value;
   // std::cout << test_msg.float64_value << std::endl;
 
