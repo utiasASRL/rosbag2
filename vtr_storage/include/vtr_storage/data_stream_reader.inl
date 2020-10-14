@@ -10,9 +10,9 @@ DataStreamReaderMoreSpecificBase<MessageType>::DataStreamReaderMoreSpecificBase(
     const std::string &data_directory, const std::string &stream_name)
     : DataStreamReaderBase(data_directory, stream_name) {}
 
-
 template <typename MessageType>
-std::shared_ptr<VTRMessage> DataStreamReaderMoreSpecificBase<MessageType>::convertBagMessage(
+std::shared_ptr<VTRMessage>
+DataStreamReaderMoreSpecificBase<MessageType>::convertBagMessage(
     std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message) {
   std::shared_ptr<VTRMessage> anytype_msg;
   if (bag_message) {
@@ -32,24 +32,23 @@ std::shared_ptr<VTRMessage> DataStreamReaderMoreSpecificBase<MessageType>::conve
   return anytype_msg;
 }
 
-
 template <typename MessageType, typename CalibrationType>
 std::shared_ptr<VTRMessage>
-DataStreamReader<MessageType,CalibrationType>::fetchCalibration() {
+DataStreamReader<MessageType, CalibrationType>::fetchCalibration() {
   if (!calibration_fetched_) {
-    if (!(this->base_directory_/CALIBRATION_FOLDER).exists()) {
-      throw NoBagExistsException(this->base_directory_/CALIBRATION_FOLDER);
+    if (!(this->base_directory_ / CALIBRATION_FOLDER).exists()) {
+      throw NoBagExistsException(this->base_directory_ / CALIBRATION_FOLDER);
     }
     calibration_reader_ =
         std::make_shared<RandomAccessReader>(CALIBRATION_FOLDER);
 
-    rosbag2_cpp::StorageOptions calibration_storage_options = this->storage_options_;
+    rosbag2_cpp::StorageOptions calibration_storage_options =
+        this->storage_options_;
     calibration_storage_options.uri =
         (this->base_directory_ / CALIBRATION_FOLDER).string();
     calibration_reader_->open(calibration_storage_options,
                               this->converter_options_);
-    rclcpp::Serialization<CalibrationType>
-        calibration_serialization;
+    rclcpp::Serialization<CalibrationType> calibration_serialization;
 
     auto bag_message = calibration_reader_->read_at_index(1);
 

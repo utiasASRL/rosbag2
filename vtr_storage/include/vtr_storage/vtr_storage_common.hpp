@@ -15,7 +15,7 @@ namespace storage {
 
 constexpr const char CALIBRATION_FOLDER[] = "calibration";
 
-class NoCalibration{};
+class NoCalibration {};
 
 struct NoBagExistsException : public std::runtime_error {
   NoBagExistsException(rcpputils::fs::path directory)

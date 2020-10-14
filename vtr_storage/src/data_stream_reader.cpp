@@ -3,9 +3,7 @@
 namespace vtr {
 namespace storage {
 
-DataStreamReaderBase::~DataStreamReaderBase() {
-  close();
-}
+DataStreamReaderBase::~DataStreamReaderBase() { close(); }
 
 void DataStreamReaderBase::close() {
   reader_.reset();
@@ -26,8 +24,7 @@ void DataStreamReaderBase::openAndGetMessageType() {
   // type?
 }
 
-std::shared_ptr<VTRMessage> DataStreamReaderBase::readAtIndex(
-    int32_t index) {
+std::shared_ptr<VTRMessage> DataStreamReaderBase::readAtIndex(int32_t index) {
   openAndGetMessageType();
   auto bag_message = reader_->read_at_index(index);
   return convertBagMessage(bag_message);
@@ -41,8 +38,7 @@ std::shared_ptr<VTRMessage> DataStreamReaderBase::readAtTimestamp(
 }
 
 std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
-DataStreamReaderBase::readAtIndexRange(int32_t index_begin,
-                                                int32_t index_end) {
+DataStreamReaderBase::readAtIndexRange(int32_t index_begin, int32_t index_end) {
   openAndGetMessageType();
   auto bag_message_vector =
       reader_->read_at_index_range(index_begin, index_end);
@@ -81,8 +77,7 @@ bool DataStreamReaderBase::seekByIndex(int32_t index) {
   return reader_->seek_by_index(index);
 }
 
-bool DataStreamReaderBase::seekByTimestamp(
-    rcutils_time_point_value_t time) {
+bool DataStreamReaderBase::seekByTimestamp(rcutils_time_point_value_t time) {
   openAndGetMessageType();
   seeked_ = true;
   return reader_->seek_by_timestamp(time);
