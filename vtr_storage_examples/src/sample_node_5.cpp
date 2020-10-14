@@ -19,6 +19,7 @@
 // sample code showing how to write/fetch calibration
 int main() {
   using TestMsgT = test_msgs::msg::BasicTypes;
+  using RigCalibration = vtr_messages::msg::RigCalibration;
   TestMsgT test_msg;
 
   std::string base_url = "/home/daniel/test/ROS2BagFileParsing/dev_ws/test_rosbag2_writer_api_bag";
@@ -40,8 +41,8 @@ int main() {
   }
 
   // read calibration and data
-  vtr::storage::DataStreamReader<TestMsgT> reader(base_url, stream_name);
-  auto calibration = reader.fetchCalibration()->template get<vtr_messages::msg::RigCalibration>();
+  vtr::storage::DataStreamReader<TestMsgT, RigCalibration> reader(base_url, stream_name);
+  auto calibration = reader.fetchCalibration()->template get<RigCalibration>();
   for (auto num : calibration.intrinsics[0].k_mat) {
     std::cout << num << std::endl;
   }
@@ -50,4 +51,7 @@ int main() {
   for (auto message : *bag_message_vector) {
     std::cout << message->template get<TestMsgT>().float64_value << std::endl;
   }
+  
+  vtr::storage::DataStreamReader<TestMsgT> reader2(base_url, stream_name);
+  reader2.fetchCalibration();
 }

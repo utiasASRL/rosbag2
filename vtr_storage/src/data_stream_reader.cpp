@@ -3,44 +3,97 @@
 namespace vtr {
 namespace storage {
 
-std::shared_ptr<VTRMessage>
-DataStreamReaderBase::fetchCalibration() {
-  if (!calibration_fetched_) {
-    if (!(base_directory_/CALIBRATION_FOLDER).exists()) {
-      throw NoBagExistsException(base_directory_/CALIBRATION_FOLDER);
+DataStreamReaderBase::~DataStreamReaderBase() {
+  close();
+}
+
+void DataStreamReaderBase::close() {
+  reader_.reset();
+  this->opened_ = false;
+  seeked_ = false;
+}
+
+void DataStreamReaderBase::openAndGetMessageType() {
+  if (this->opened_ == false) {
+    if (!data_directory_.exists()) {
+      throw NoBagExistsException(data_directory_);
     }
-    calibration_reader_ =
-        std::make_shared<RandomAccessReader>(CALIBRATION_FOLDER);
-
-    rosbag2_cpp::StorageOptions calibration_storage_options = storage_options_;
-    calibration_storage_options.uri =
-        (base_directory_ / CALIBRATION_FOLDER).string();
-    calibration_reader_->open(calibration_storage_options,
-                              this->converter_options_);
-    rclcpp::Serialization<vtr_messages::msg::RigCalibration>
-        calibration_serialization;
-
-    auto bag_message = calibration_reader_->read_at_index(1);
-
-    if (bag_message) {
-      auto extracted_msg = std::make_shared<vtr_messages::msg::RigCalibration>();
-      rclcpp::SerializedMessage serialized_msg;
-      rclcpp::SerializedMessage extracted_serialized_msg(
-          *bag_message->serialized_data);
-      calibration_serialization.deserialize_message(&extracted_serialized_msg,
-                                                    extracted_msg.get());
-      calibration_fetched_ = true;
-      auto anytype_msg = std::make_shared<VTRMessage>(*extracted_msg);
-      anytype_msg->set_index(bag_message->database_index);
-      if (bag_message->time_stamp != NO_TIMESTAMP_VALUE) {
-        anytype_msg->set_timestamp(bag_message->time_stamp);
-      }
-      calibration_msg_ = anytype_msg;
-    } else {
-      throw std::runtime_error("calibration database has no messages!");
-    }
+    reader_ = std::make_shared<RandomAccessReader>(this->stream_name_);
+    reader_->open(this->storage_options_, this->converter_options_);
+    this->opened_ = true;
   }
-  return calibration_msg_;
+  // ToDo: get message type, specialize this->serialization_ based on message
+  // type?
+}
+
+std::shared_ptr<VTRMessage> DataStreamReaderBase::readAtIndex(
+    int32_t index) {
+  openAndGetMessageType();
+  auto bag_message = reader_->read_at_index(index);
+  return convertBagMessage(bag_message);
+}
+
+std::shared_ptr<VTRMessage> DataStreamReaderBase::readAtTimestamp(
+    rcutils_time_point_value_t time) {
+  openAndGetMessageType();
+  auto bag_message = reader_->read_at_timestamp(time);
+  return convertBagMessage(bag_message);
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
+DataStreamReaderBase::readAtIndexRange(int32_t index_begin,
+                                                int32_t index_end) {
+  openAndGetMessageType();
+  auto bag_message_vector =
+      reader_->read_at_index_range(index_begin, index_end);
+  auto deserialized_bag_message_vector =
+      std::make_shared<std::vector<std::shared_ptr<VTRMessage>>>();
+  for (auto bag_message : *bag_message_vector) {
+    auto anytype_msg = convertBagMessage(bag_message);
+    deserialized_bag_message_vector->push_back(
+        anytype_msg);  // ToDo: reserve the vector instead of pushing
+                       // back
+  }
+  return deserialized_bag_message_vector;
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<VTRMessage>>>
+DataStreamReaderBase::readAtTimestampRange(
+    rcutils_time_point_value_t time_begin,
+    rcutils_time_point_value_t time_end) {
+  openAndGetMessageType();
+  auto bag_message_vector =
+      reader_->read_at_timestamp_range(time_begin, time_end);
+  auto deserialized_bag_message_vector =
+      std::make_shared<std::vector<std::shared_ptr<VTRMessage>>>();
+  for (auto bag_message : *bag_message_vector) {
+    auto anytype_msg = convertBagMessage(bag_message);
+    deserialized_bag_message_vector->push_back(
+        anytype_msg);  // ToDo: reserve the vector instead of pushing
+                       // back
+  }
+  return deserialized_bag_message_vector;
+}
+
+bool DataStreamReaderBase::seekByIndex(int32_t index) {
+  openAndGetMessageType();
+  seeked_ = true;
+  return reader_->seek_by_index(index);
+}
+
+bool DataStreamReaderBase::seekByTimestamp(
+    rcutils_time_point_value_t time) {
+  openAndGetMessageType();
+  seeked_ = true;
+  return reader_->seek_by_timestamp(time);
+}
+
+std::shared_ptr<VTRMessage> DataStreamReaderBase::readNextFromSeek() {
+  if (!seeked_) {
+    seekByIndex(1);  // read the whole database
+  }
+  auto bag_message = reader_->read_next_from_seek();
+  return convertBagMessage(bag_message);
 }
 
 }  // namespace storage

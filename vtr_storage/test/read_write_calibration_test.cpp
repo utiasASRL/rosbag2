@@ -16,6 +16,7 @@
 #include "test_msgs/msg/basic_types.hpp"
 
 namespace fs = std::filesystem;
+using RigCalibration = vtr_messages::msg::RigCalibration;
 
 // sample code showing how to use the data streams
 TEST(VTRStorage, readWriteCalibration) {
@@ -33,7 +34,7 @@ TEST(VTRStorage, readWriteCalibration) {
   }
 
   // attempt to read calibration, should fail
-  vtr::storage::DataStreamReader<TestMsgT> reader(working_dir, stream_name);
+  vtr::storage::DataStreamReader<TestMsgT, RigCalibration> reader(working_dir, stream_name);
   EXPECT_THROW(reader.fetchCalibration(), vtr::storage::NoBagExistsException);
 
   // write a calibration msg
@@ -45,7 +46,7 @@ TEST(VTRStorage, readWriteCalibration) {
   calibration_writer.write(calibration_msg);
 
   // read calibration and data
-  auto calibration = reader.fetchCalibration()->template get<vtr_messages::msg::RigCalibration>();
+  auto calibration = reader.fetchCalibration()->template get<RigCalibration>();
   EXPECT_EQ(calibration, calibration_msg);
 
   auto bag_message_vector = reader.readAtIndexRange(1, 9);
@@ -55,6 +56,11 @@ TEST(VTRStorage, readWriteCalibration) {
     EXPECT_EQ(test_msg.float64_value, count*10);
     ++count;
   }
+
+  // test reading calibration with no calibration type specified
+  // should assert() and crash
+  vtr::storage::DataStreamReader<TestMsgT> reader2(working_dir, stream_name);
+  ASSERT_DEATH(reader2.fetchCalibration(),"");
 }
 
 int main(int argc, char** argv) {
