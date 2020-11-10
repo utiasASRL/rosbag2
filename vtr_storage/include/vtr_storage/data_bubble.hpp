@@ -47,6 +47,7 @@ class DataBubble {
   DataBubble& operator=(const DataBubble&) = delete;
   DataBubble& operator=(DataBubble&&) = delete;
 
+  bool isInitialized() { return data_stream_ != nullptr; }
   /**
    * \brief Initializes a data bubble with a data stream.
    * \param data_stream A pointer to the associated data stream.
