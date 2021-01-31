@@ -70,7 +70,7 @@ public:
    * \param storage_options Options to configure the storage
    * \param converter_options options to define in which format incoming messages are stored
    **/
-  virtual void open(
+  void open(
     const StorageOptions & storage_options, const ConverterOptions & converter_options) override;
 
   void reset() override;

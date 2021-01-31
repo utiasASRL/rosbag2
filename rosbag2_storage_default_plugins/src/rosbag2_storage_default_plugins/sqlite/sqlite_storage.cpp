@@ -85,14 +85,15 @@ void SqliteStorage::open(
     // READ_WRITE requires the DB to not exist.
     if (rcpputils::fs::path(relative_path_).exists()) {
       io_flag = rosbag2_storage::storage_interfaces::IOFlag::APPEND;
-      // std::cout << "Warning: " << relative_path_ << "' already exists! Switching to append mode." << std::endl;
     }
   } else if (is_read_only(io_flag)) {  // READ_ONLY
     relative_path_ = uri;
 
     // READ_ONLY require the DB to exist
     // MY EDIT: also requires the file to end in .db3
-    if (!(rcpputils::fs::path(relative_path_).exists() && relative_path_.substr(relative_path_.length()-4) == ".db3")) {
+    if (!(rcpputils::fs::path(relative_path_).exists() &&
+      relative_path_.substr(relative_path_.length() - 4) == ".db3"))
+    {
       throw std::runtime_error(
               "Failed to read from bag: File '" + relative_path_ + "' does not exist!");
     }
@@ -142,7 +143,8 @@ void SqliteStorage::commit_transaction()
   active_transaction_ = false;
 }
 
-int32_t SqliteStorage::get_last_inserted_id() {
+int32_t SqliteStorage::get_last_inserted_id()
+{
   return database_->get_last_insert_id();
 }
 
@@ -230,7 +232,6 @@ bool SqliteStorage::seek_by_timestamp(rcutils_time_point_value_t timestamp)
 
 std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::modified_read_next()
 {
-  
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
   if (modified_current_message_row_ != modified_message_result_.end()) {
     bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
@@ -244,7 +245,8 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::modified_r
   return bag_message;
 }
 
-std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_timestamp(rcutils_time_point_value_t timestamp)
+std::shared_ptr<rosbag2_storage::SerializedBagMessage>
+SqliteStorage::read_at_timestamp(rcutils_time_point_value_t timestamp)
 {
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
 
@@ -253,17 +255,16 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_ti
     "FROM messages JOIN topics ON messages.topic_id = topics.id "
     "WHERE messages.timestamp = " + std::to_string(timestamp) + " "
     "ORDER BY messages.timestamp;");
-    
+
   auto message_result = read_statement->execute_query<
     std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
 
-  
   // if(message_result.begin() == message_result.end()) {
   //   throw std::runtime_error("No messages found for timestamp " + std::to_string(timestamp));
   // }
-  
+
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
-  if(current_message_row != message_result.end()) {  // message exists
+  if (current_message_row != message_result.end()) {  // message exists
     bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
     bag_message->serialized_data = std::get<0>(*current_message_row);
     bag_message->time_stamp = std::get<1>(*current_message_row);
@@ -277,7 +278,9 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_ti
   return bag_message;
 }
 
-std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_index(int32_t index) {
+std::shared_ptr<rosbag2_storage::SerializedBagMessage>
+SqliteStorage::read_at_index(int32_t index)
+{
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message;
 
   auto read_statement = database_->prepare_statement(
@@ -285,16 +288,16 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_in
     "FROM messages JOIN topics ON messages.topic_id = topics.id "
     "WHERE messages.id = " + std::to_string(index) + " "
     "ORDER BY messages.timestamp;");
-    
+
   auto message_result = read_statement->execute_query<
     std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
-  
+
   // if(message_result.begin() == message_result.end()) {
   //   throw std::runtime_error("No messages found for id " + std::to_string(index));
   // }
-  
+
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
-  if(current_message_row != message_result.end()) {  // message exists
+  if (current_message_row != message_result.end()) {  // message exists
     bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
     bag_message->serialized_data = std::get<0>(*current_message_row);
     bag_message->time_stamp = std::get<1>(*current_message_row);
@@ -305,18 +308,23 @@ std::shared_ptr<rosbag2_storage::SerializedBagMessage> SqliteStorage::read_at_in
   return bag_message;
 }
 
-std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>> SqliteStorage::read_at_timestamp_range(rcutils_time_point_value_t timestamp_begin, rcutils_time_point_value_t timestamp_end) {
-
+std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+SqliteStorage::read_at_timestamp_range(
+  rcutils_time_point_value_t timestamp_begin,
+  rcutils_time_point_value_t timestamp_end)
+{
   auto read_statement = database_->prepare_statement(
     "SELECT data, timestamp, topics.name, messages.id "
     "FROM messages JOIN topics ON messages.topic_id = topics.id "
-    "WHERE messages.timestamp BETWEEN " + std::to_string(timestamp_begin) + " AND " + std::to_string(timestamp_end) + " "
+    "WHERE messages.timestamp BETWEEN " + std::to_string(timestamp_begin) +
+    " AND " + std::to_string(timestamp_end) + " "
     "ORDER BY messages.timestamp;");
-    
+
   auto message_result = read_statement->execute_query<
     std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
 
-  auto bag_message_vector = std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
+  auto bag_message_vector =
+    std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
 
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
   for (; current_message_row != message_result.end(); ++current_message_row) {
@@ -329,18 +337,23 @@ std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessag
   return bag_message_vector;
 }
 
-std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>> SqliteStorage::read_at_index_range(int32_t index_begin, int32_t index_end) {
-
+std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+SqliteStorage::read_at_index_range(
+  int32_t index_begin,
+  int32_t index_end)
+{
   auto read_statement = database_->prepare_statement(
     "SELECT data, timestamp, topics.name, messages.id "
     "FROM messages JOIN topics ON messages.topic_id = topics.id "
-    "WHERE messages.id BETWEEN " + std::to_string(index_begin) + " AND " + std::to_string(index_end) + " "
+    "WHERE messages.id BETWEEN " + std::to_string(index_begin) +
+    " AND " + std::to_string(index_end) + " "
     "ORDER BY messages.timestamp;");
-    
+
   auto message_result = read_statement->execute_query<
     std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>();
-  
-  auto bag_message_vector = std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
+
+  auto bag_message_vector =
+    std::make_shared<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>();
 
   ModifiedReadQueryResult::Iterator current_message_row = message_result.begin();
   for (; current_message_row != message_result.end(); ++current_message_row) {

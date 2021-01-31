@@ -58,7 +58,7 @@ public:
 
   virtual ~SequentialReader();
 
-  virtual void open(
+  void open(
     const StorageOptions & storage_options, const ConverterOptions & converter_options) override;
 
   void reset() override;

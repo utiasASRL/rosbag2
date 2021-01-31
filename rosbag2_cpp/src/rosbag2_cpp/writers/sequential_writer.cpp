@@ -258,7 +258,8 @@ void SequentialWriter::write(std::shared_ptr<rosbag2_storage::SerializedBagMessa
   }
 }
 
-int32_t SequentialWriter::get_last_inserted_id() {
+int32_t SequentialWriter::get_last_inserted_id()
+{
   if (!storage_) {
     throw std::runtime_error("Bag is not open. Call open() before writing.");
   }

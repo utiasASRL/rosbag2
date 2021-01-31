@@ -57,18 +57,8 @@ void SequentialAppendWriter::open(
                                                           converter_factory_);
   }
   rcpputils::fs::path db_path(base_folder_);
-  // if (db_path.is_directory()) {
-  // std::cout << "Database directory already exists (" << db_path.string()
-  //           << "), assuming append mode." << std::endl;
-  //   append_mode_ = true;
-  // }
-  bool dir_created = rcpputils::fs::create_directories(
-      db_path);  // will fail if file already exists, i.e. in append mode
-  // if (!dir_created) {
-  //   std::stringstream error;
-  //   error << "Failed to create database directory (" << db_path.string() <<
-  //   ")."; throw std::runtime_error{error.str()};
-  // }
+
+  rcpputils::fs::create_directories(db_path);  // will fail if file already exists, i.e. in append mode
 
   const auto storage_uri = format_storage_uri(base_folder_, 0);
   if (!append_mode_) {
