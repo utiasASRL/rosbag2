@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "rcpputils/filesystem_helper.hpp"
 
@@ -326,6 +327,14 @@ SequentialWriter::get_writeable_message(
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> message)
 {
   return converter_ ? converter_->convert(message) : message;
+}
+
+int32_t SequentialWriter::get_last_inserted_id()
+{
+  if (!storage_) {
+    throw std::runtime_error("Bag is not open. Call open() before writing.");
+  }
+  return storage_->get_last_inserted_id();
 }
 
 bool SequentialWriter::should_split_bagfile() const

@@ -39,6 +39,7 @@ SqliteWrapper::SqliteWrapper(
   std::unordered_map<std::string, std::string> && pragmas)
 : db_ptr(nullptr)
 {
+  // std::cout << "URI: " << uri << std::endl;
   if (io_flag == rosbag2_storage::storage_interfaces::IOFlag::READ_ONLY) {
     int rc = sqlite3_open_v2(
       uri.c_str(), &db_ptr,
@@ -46,7 +47,8 @@ SqliteWrapper::SqliteWrapper(
     if (rc != SQLITE_OK) {
       std::stringstream errmsg;
       errmsg << "Could not read-only open database. SQLite error (" <<
-        rc << "): " << sqlite3_errstr(rc);
+        rc << "): " << sqlite3_errstr(rc) << ". Extended error code: " <<
+        sqlite3_extended_errcode(db_ptr);
       throw SqliteException{errmsg.str()};
     }
   } else {
@@ -56,7 +58,8 @@ SqliteWrapper::SqliteWrapper(
     if (rc != SQLITE_OK) {
       std::stringstream errmsg;
       errmsg << "Could not read-write open database. SQLite error (" <<
-        rc << "): " << sqlite3_errstr(rc);
+        rc << "): " << sqlite3_errstr(rc) << ". Extended error code: " <<
+        sqlite3_extended_errcode(db_ptr);
       throw SqliteException{errmsg.str()};
     }
   }
