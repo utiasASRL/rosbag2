@@ -69,6 +69,21 @@ public:
 
   std::shared_ptr<rosbag2_storage::SerializedBagMessage> read_next() override;
 
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage>
+  read_at_timestamp(rcutils_time_point_value_t timestamp) override;
+
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> read_at_index(int32_t index) override;
+
+  std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+  read_at_timestamp_range(
+    rcutils_time_point_value_t timestamp_begin,
+    rcutils_time_point_value_t timestamp_end) override;
+
+  std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+  read_at_index_range(int32_t index_begin, int32_t index_end) override;
+
+  int32_t get_last_inserted_id() override;
+
   std::vector<rosbag2_storage::TopicMetadata> get_all_topics_and_types() override;
 
   rosbag2_storage::BagMetadata get_metadata() override;
@@ -87,6 +102,12 @@ public:
 
   std::string get_storage_setting(const std::string & key);
 
+  bool seek_by_index(int32_t index) override;
+
+  bool seek_by_timestamp(rcutils_time_point_value_t timestamp) override;
+
+  std::shared_ptr<rosbag2_storage::SerializedBagMessage> modified_read_next() override;
+
 private:
   void initialize();
   void prepare_for_writing();
@@ -99,14 +120,19 @@ private:
 
   using ReadQueryResult = SqliteStatementWrapper::QueryResult<
     std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string>;
+  using ModifiedReadQueryResult = SqliteStatementWrapper::QueryResult<
+    std::shared_ptr<rcutils_uint8_array_t>, rcutils_time_point_value_t, std::string, int32_t>;
 
   std::shared_ptr<SqliteWrapper> database_ RCPPUTILS_TSA_GUARDED_BY(database_write_mutex_);
   SqliteStatement write_statement_ {};
   SqliteStatement read_statement_ {};
   ReadQueryResult message_result_ {nullptr};
+  ModifiedReadQueryResult modified_message_result_ {nullptr};
   ReadQueryResult::Iterator current_message_row_ {
     nullptr, SqliteStatementWrapper::QueryResult<>::Iterator::POSITION_END};
-  std::unordered_map<std::string, int> topics_ RCPPUTILS_TSA_GUARDED_BY(database_write_mutex_);
+  ModifiedReadQueryResult::Iterator modified_current_message_row_ {
+    nullptr, SqliteStatementWrapper::QueryResult<>::Iterator::POSITION_END};
+  std::unordered_map<std::string, int> topics_;
   std::vector<rosbag2_storage::TopicMetadata> all_topics_and_types_;
   std::string relative_path_;
   std::atomic_bool active_transaction_ {false};

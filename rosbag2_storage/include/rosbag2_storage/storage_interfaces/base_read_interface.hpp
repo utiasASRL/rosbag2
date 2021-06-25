@@ -37,6 +37,47 @@ public:
 
   virtual std::shared_ptr<SerializedBagMessage> read_next() = 0;
 
+  virtual std::shared_ptr<SerializedBagMessage>
+  read_at_timestamp(rcutils_time_point_value_t timestamp)
+  {
+    timestamp++;
+    return nullptr;
+  }
+
+  virtual std::shared_ptr<SerializedBagMessage>
+  read_at_index(int32_t index) {index++; return nullptr;}
+
+  virtual std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+  read_at_timestamp_range(
+    rcutils_time_point_value_t timestamp_begin,
+    rcutils_time_point_value_t timestamp_end)
+  {
+    // dummy code
+    timestamp_begin++;
+    timestamp_end++;
+    return nullptr;
+  }
+
+  virtual std::shared_ptr<std::vector<std::shared_ptr<rosbag2_storage::SerializedBagMessage>>>
+  read_at_index_range(int32_t index_begin, int32_t index_end)
+  {
+    // dummy code
+    index_begin++;
+    index_end++;
+    return nullptr;
+  }
+
+  virtual bool seek_by_index(int32_t index) {index++; return false;}
+
+  virtual bool seek_by_timestamp(rcutils_time_point_value_t timestamp)
+  {
+    timestamp++;
+    return false;
+  }
+
+  virtual std::shared_ptr<rosbag2_storage::SerializedBagMessage>
+  modified_read_next() {return nullptr;}
+
   virtual std::vector<TopicMetadata> get_all_topics_and_types() = 0;
 };
 
